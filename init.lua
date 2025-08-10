@@ -24,7 +24,7 @@ vim.o.mouse = 'a'
 vim.o.cursorline = true
 vim.o.colorcolumn = '120'
 vim.o.scrolloff = 10
-
+vim.opt.completeopt = {}
 -- Misc
 vim.o.swapfile = false
 vim.o.undofile = true
@@ -96,9 +96,8 @@ vim.pack.add({
     { src = "https://github.com/stevearc/oil.nvim" },
     { src = "https://github.com/nvim-treesitter/nvim-treesitter",          version = "main" },
     { src = "https://github.com/chomosuke/typst-preview.nvim" },
-    { src = "https://github.com/neovim/nvim-lspconfig" },
     { src = "https://github.com/mason-org/mason.nvim" },
-    { src = "https://github.com/L3MON4D3/LuaSnip" },
+    -- { src = "https://github.com/L3MON4D3/LuaSnip" },
     { src = "https://github.com/echasnovski/mini.ai" },
     { src = "https://github.com/echasnovski/mini.surround" },
     { src = "https://github.com/echasnovski/mini.statusline" },
@@ -138,7 +137,6 @@ require "mini.pairs".setup()
 require "mini.move".setup()
 require "mini.splitjoin".setup()
 require 'nvim-web-devicons'.setup()
-
 
 require "blink.indent".setup {
     blocked = {
@@ -399,6 +397,8 @@ vim.api.nvim_create_autocmd("LspAttach", {
         map('n', 'gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
     end,
 })
+
+-- local lspconfig = require("lspconfig")
 
 vim.lsp.enable({
     "lua_ls",
