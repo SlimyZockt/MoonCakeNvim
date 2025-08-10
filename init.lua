@@ -53,7 +53,7 @@ vim.o.foldmethod = 'expr'
 vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
 vim.o.foldlevel = 99
 vim.o.foldlevelstart = 2
-vim.opt.foldnestmax = 2
+vim.o.foldnestmax = 2
 
 vim.diagnostic.config {
     severity_sort = true,
@@ -117,6 +117,7 @@ vim.pack.add({
     { src = "https://github.com/christoomey/vim-tmux-navigator" },
     { src = "https://github.com/lambdalisue/vim-suda" },
     { src = "https://github.com/saghen/blink.indent" },
+    { src = "https://github.com/OXY2DEV/markview.nvim" },
 })
 
 for _, v in pairs(vim.pack.get()) do
@@ -136,7 +137,13 @@ require "mini.statusline".setup()
 require "mini.pairs".setup()
 require "mini.move".setup()
 require "mini.splitjoin".setup()
-require 'nvim-web-devicons'.setup()
+require "nvim-web-devicons".setup()
+require "typst-preview".setup()
+require "markview".setup({
+    preview = {
+        icon_provider = "mini", -- "mini" or "devicons"
+    }
+})
 
 require "blink.indent".setup {
     blocked = {
@@ -432,13 +439,24 @@ map('n', '<Esc>', '<cmd>nohlsearch<CR>')
 map('n', '<leader>u', ':update<CR> :source<CR>', "[U]pdate config")
 map('n', '<leader>q', vim.diagnostic.setloclist, 'Open diagnostic [Q]uickfix list')
 map('t', '<Esc><Esc>', '<C-\\><C-n>', 'Exit terminal mode')
-map('n', '<C-h>', '<C-w><C-h>', 'Move focus to the left window')
-map('n', '<C-l>', '<C-w><C-l>', 'Move focus to the right window')
-map('n', '<C-j>', '<C-w><C-j>', 'Move focus to the lower window')
-map('n', '<C-k>', '<C-w><C-k>', 'Move focus to the upper window')
+-- map('n', '<C-h>', '<C-w><C-h>', 'Move focus to the left window')
+-- map('n', '<C-l>', '<C-w><C-l>', 'Move focus to the right window')
+-- map('n', '<C-j>', '<C-w><C-j>', 'Move focus to the lower window')
+-- map('n', '<C-k>', '<C-w><C-k>', 'Move focus to the upper window')
+map("n", "<C-h>", "<cmd>TmuxNavigateLeft<CR>", "Navigate Left (tmux)")
+map("n", "<C-j>", "<cmd>TmuxNavigateDown<CR>", "Navigate Down (tmux)")
+map("n", "<C-k>", "<cmd>TmuxNavigateUp<CR>", "Navigate Up (tmux)")
+map("n", "<C-l>", "<cmd>TmuxNavigateRight<CR>", "Navigate Right (tmux)")
+map("n", "<C-\\>", "<cmd>TmuxNavigatePrevious<CR>", "Navigate Previous (tmux)")
+
 map({ 'n', 'v', 'x' }, '<leader>y', '"+y', "[Y]anking Global")
+map('n', '<leader>tb', ":%!xxd -r<CR>", "[B]inary")
+map('n', '<leader>te', ":%!xxd<CR>", "[H]ex")
 map('n', '<leader>te', ":Oil<CR>", "Open [E]xplorer")
 map('n', '<leader>tu', vim.cmd.UndotreeToggle, "Open [U]undotree")
+map('n', '<leader>tt', ":TypstPreview<CR>", "[T]ypstPreview")
+map('n', '<leader>tm', ":Markview Toggle<CR>", "[M]arkview")
+
 map('n', '<leader>f', vim.lsp.buf.format, "[F]ormat")
 
 local builtin = require 'telescope.builtin'
