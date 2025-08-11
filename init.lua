@@ -328,6 +328,7 @@ require('telescope').setup {
             '--glob=!**/dist/*',
             '--glob=!**/yarn.lock',
             '--glob=!**/*.import',
+            '--glob=!**/*.uid',
             '--glob=!**/flake.lock',
             '--glob=!**/package-lock.json',
         },
@@ -347,6 +348,7 @@ require('telescope').setup {
                 '--glob=!**/dist/*',
                 '--glob=!**/yarn.lock',
                 '--glob=!**/*.import',
+                '--glob=!**/*.uid',
                 '--glob=!**/flake.lock',
                 '--glob=!**/package-lock.json',
             },
@@ -414,8 +416,8 @@ require('nvim-treesitter.configs').setup({
     },
 })
 
-require "lspconfig"
 -- LPS
+require "lspconfig"
 vim.lsp.enable({
     "lua_ls",
     "svelte",
@@ -441,6 +443,13 @@ vim.lsp.enable({
     "fish",
     "nixd",
 })
+
+local gdproject = io.open(vim.fn.getcwd() .. '/project.godot', 'r')
+if gdproject then
+    io.close(gdproject)
+    -- vim.fn.serverstart './godothost'
+    vim.lsp.enable("gdscript")
+end
 
 -- colorscheme
 require("kanagawa").setup({
