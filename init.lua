@@ -438,6 +438,7 @@ vim.lsp.enable({
     "templ",
     "markdown_oxide",
     "fish",
+    "nixd",
 })
 
 -- colorscheme
