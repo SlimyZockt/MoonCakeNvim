@@ -414,6 +414,7 @@ require('nvim-treesitter.configs').setup({
     },
 })
 
+require "lspconfig"
 -- LPS
 vim.lsp.enable({
     "lua_ls",

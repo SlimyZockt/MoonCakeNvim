@@ -54,11 +54,12 @@ return {
   filetypes = { 'typst' },
   root_markers = { '.git' },
   on_attach = function(client, bufnr)
+    print("enable Typst")
     for _, command in ipairs {
       'tinymist.exportSvg',
       'tinymist.exportPng',
       'tinymist.exportPdf',
-      -- 'tinymist.exportHtml', -- Use typst 0.13
+      'tinymist.exportHtml', -- Use typst 0.13
       'tinymist.exportMarkdown',
       'tinymist.exportText',
       'tinymist.exportQuery',
