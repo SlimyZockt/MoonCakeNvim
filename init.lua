@@ -27,7 +27,6 @@ vim.o.scrolloff = 10
 vim.opt.completeopt = {}
 -- Misc
 vim.o.swapfile = false
-vim.o.undofile = true
 vim.o.ignorecase = true
 vim.o.smartindent = true
 vim.o.showmode = false
@@ -52,14 +51,36 @@ vim.o.spelllang = 'en_us,de_de'
 vim.o.foldmethod = 'expr'
 vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
 vim.o.foldlevel = 99
-vim.o.foldlevelstart = 2
-vim.o.foldnestmax = 2
+vim.o.foldlevelstart = 99
+vim.o.foldnestmax = 20
 
+-- save Folds
+local group = vim.api.nvim_create_augroup("remember_folds", { clear = true })
+vim.api.nvim_create_autocmd("BufWinLeave", {
+    group = group,
+    callback = function()
+        local ft = vim.bo.filetype
+        if ft ~= "TelescopePrompt" and vim.bo.buftype == "" then
+            vim.cmd("silent! mkview")
+        end
+    end,
+})
+
+vim.api.nvim_create_autocmd("BufWinEnter", {
+    group = group,
+    callback = function()
+        local ft = vim.bo.filetype
+        if ft ~= "TelescopePrompt" and vim.bo.buftype == "" then
+            vim.cmd("silent! loadview")
+        end
+    end,
+})
+-- diagnostic
 vim.diagnostic.config {
     severity_sort = true,
     float = { border = 'rounded', source = 'if_many' },
     underline = { severity = vim.diagnostic.severity.ERROR },
-    signs = {
+    signs = { -- sing
         text = {
             [vim.diagnostic.severity.ERROR] = '󰅚 ',
             [vim.diagnostic.severity.WARN] = '󰀪 ',
@@ -82,7 +103,7 @@ vim.diagnostic.config {
     },
 }
 
-
+-- Highlight yanking
 vim.api.nvim_create_autocmd('TextYankPost', {
     desc = 'Highlight when yanking (copying) text',
     group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
@@ -90,36 +111,48 @@ vim.api.nvim_create_autocmd('TextYankPost', {
         vim.highlight.on_yank()
     end,
 })
-
 vim.pack.add({
+    -- Visual
     { src = "https://github.com/rebelot/kanagawa.nvim" },
+    { src = "https://github.com/nvim-tree/nvim-web-devicons" },
+    -- Trees
+    { src = "https://github.com/mbbill/undotree" },
     { src = "https://github.com/stevearc/oil.nvim" },
+    -- ( auto completion )/highlight
     { src = "https://github.com/nvim-treesitter/nvim-treesitter",          version = "main" },
-    { src = "https://github.com/chomosuke/typst-preview.nvim" },
+    { src = "https://github.com/nvim-treesitter/nvim-treesitter-context" },
     { src = "https://github.com/mason-org/mason.nvim" },
-    -- { src = "https://github.com/L3MON4D3/LuaSnip" },
+    { src = "https://github.com/saghen/blink.cmp" },
+    -- Mini Text editing
     { src = "https://github.com/echasnovski/mini.ai" },
     { src = "https://github.com/echasnovski/mini.surround" },
-    { src = "https://github.com/echasnovski/mini.statusline" },
     { src = "https://github.com/echasnovski/mini.pairs" },
     { src = "https://github.com/echasnovski/mini.move" },
     { src = "https://github.com/echasnovski/mini.splitjoin" },
+    { src = "https://github.com/echasnovski/mini.operators" },
+    -- Mini Workflow
+    { src = "https://github.com/echasnovski/mini.bracketed" },
+    -- Mini Appearance
     { src = "https://github.com/echasnovski/mini.icons" },
-    { src = "https://github.com/mbbill/undotree" },
-    { src = "https://github.com/saghen/blink.cmp" },
-    { src = "https://github.com/folke/which-key.nvim" },
+    { src = "https://github.com/echasnovski/mini.statusline" },
+    { src = "https://github.com/echasnovski/mini.indentscope" },
+    { src = "https://github.com/echasnovski/mini.hipatterns" },
+    -- Telescope
     { src = "https://github.com/nvim-telescope/telescope.nvim" },
     { src = "https://github.com/nvim-lua/plenary.nvim" },
     { src = "https://github.com/nvim-telescope/telescope-ui-select.nvim" },
     { src = "https://github.com/nvim-telescope/telescope-fzf-native.nvim", build = 'make' },
-    { src = "https://github.com/nvim-tree/nvim-web-devicons" },
-    { src = "https://github.com/nvim-treesitter/nvim-treesitter-context" },
+    -- Navigation
     { src = "https://github.com/christoomey/vim-tmux-navigator" },
-    { src = "https://github.com/lambdalisue/vim-suda" },
-    { src = "https://github.com/saghen/blink.indent" },
+    -- Preview
+    { src = "https://github.com/folke/which-key.nvim" },
     { src = "https://github.com/OXY2DEV/markview.nvim" },
+    { src = "https://github.com/chomosuke/typst-preview.nvim" },
+    -- Misc
+    { src = "https://github.com/lambdalisue/vim-suda" },
 })
 
+-- setup plugin
 for _, v in pairs(vim.pack.get()) do
     if v.spec.name == "telescope-fzf-native.nvim" then
         local fzf_path = v.path
@@ -129,7 +162,7 @@ for _, v in pairs(vim.pack.get()) do
     end
 end
 
-require "mason".setup()
+-- Mini
 require "mini.ai".setup()
 require "mini.icons".setup()
 require "mini.surround".setup()
@@ -137,7 +170,28 @@ require "mini.statusline".setup()
 require "mini.pairs".setup()
 require "mini.move".setup()
 require "mini.splitjoin".setup()
+require 'mini.operators'.setup()
+require 'mini.bracketed'.setup()
+require 'mini.hipatterns'.setup({
+    highlighters = {
+        fixme     = { pattern = '%f[%w]()FIXME()%f[%W]', group = 'MiniHipatternsFixme' },
+        hack      = { pattern = '%f[%w]()HACK()%f[%W]', group = 'MiniHipatternsHack' },
+        todo      = { pattern = '%f[%w]()TODO()%f[%W]', group = 'MiniHipatternsTodo' },
+        note      = { pattern = '%f[%w]()NOTE()%f[%W]', group = 'MiniHipatternsNote' },
+        hex_color = require 'mini.hipatterns'.gen_highlighter.hex_color(),
+    },
+})
+require('mini.indentscope').setup({
+    draw = {
+        delay = 0,
+        animation = require('mini.indentscope').gen_animation.none(),
+    },
+
+    symbol = '▎',
+})
+-- Icons
 require "nvim-web-devicons".setup()
+-- Preview
 require "typst-preview".setup()
 require "markview".setup({
     preview = {
@@ -145,61 +199,67 @@ require "markview".setup({
     }
 })
 
-require "blink.indent".setup {
-    blocked = {
-        buftypes = {},
-        filetypes = {},
-    },
-    static = {
-        enabled = true,
-        char = '▎',
-        priority = 1,
-        highlights = { 'BlinkIndent' },
-    },
-    scope = {
-        enabled = true,
-        char = '▎',
-        priority = 1024,
-        -- set this to a single highlight, such as 'BlinkIndent' to disable rainbow-style indent guides
-        highlights = { 'BlinkIndent' },
-        underline = {
-            enabled = false,
-        },
-    },
-}
-
-require("kanagawa").setup({
-    transparent = true,
-    background = {       -- map the value of 'background' option to a theme
-        dark = "dragon", -- try "dragon" !
-        light = "lotus"
-    },
-    terminalColors = true,
-    overrides = function(colors)
-        local theme = colors.theme
-        return {
-            Pmenu = { fg = theme.ui.shade0, bg = theme.ui.bg_p1 }, -- add `blend = vim.o.pumblend` to enable transparency
-            PmenuSel = { fg = "NONE", bg = theme.ui.bg_p2 },
-            PmenuSbar = { bg = theme.ui.bg_m1 },
-            PmenuThumb = { bg = theme.ui.bg_p2 },
-        }
-    end,
+--- file explorer
+require "oil".setup({
+    default_file_explorer = true,
+    view_options = {
+        show_hidden = true,
+    }
 })
 
-vim.cmd.colorscheme("kanagawa")
-vim.cmd(":hi statusline guibg=NONE")
-vim.cmd([[
-  highlight TelescopeNormal guibg=NONE
-  highlight TelescopeBorder guibg=NONE
-  highlight TelescopePromptNormal guibg=NONE
-  highlight TelescopePromptBorder guibg=NONE
-  highlight TelescopeResultsNormal guibg=NONE
-  highlight TelescopeResultsBorder guibg=NONE
-  highlight TelescopePreviewNormal guibg=NONE
-  highlight TelescopePreviewBorder guibg=NONE
-]])
+-- which-key
+require "which-key".setup({
+    icons = {
+        mappings = vim.g.have_nerd_font,
+        keys = vim.g.have_nerd_font and {} or {
+            Up = '<Up> ',
+            Down = '<Down> ',
+            Left = '<Left> ',
+            Right = '<Right> ',
+            C = '<C-…> ',
+            M = '<M-…> ',
+            D = '<D-…> ',
+            S = '<S-…> ',
+            CR = '<CR> ',
+            Esc = '<Esc> ',
+            ScrollWheelDown = '<ScrollWheelDown> ',
+            ScrollWheelUp = '<ScrollWheelUp> ',
+            NL = '<NL> ',
+            BS = '<BS> ',
+            Space = '<Space> ',
+            Tab = '<Tab> ',
+            F1 = '<F1>',
+            F2 = '<F2>',
+            F3 = '<F3>',
+            F4 = '<F4>',
+            F5 = '<F5>',
+            F6 = '<F6>',
+            F7 = '<F7>',
+            F8 = '<F8>',
+            F9 = '<F9>',
+            F10 = '<F10>',
+            F11 = '<F11>',
+            F12 = '<F12>',
+        },
+    },
 
+    spec = {
+        { '<leader>c', group = '[C]ode',    mode = { 'n', 'x' } },
+        { '<leader>d', group = '[D]ocument' },
+        { '<leader>r', group = '[R]ename' },
+        { '<leader>s', group = '[S]earch' },
+        { '<leader>t', group = '[T]oggle' },
+    },
 
+    windows = {
+        position = "bottom",
+        winblend = 0,
+        width = vim.o.columns,
+    },
+})
+
+-- (auto completion)/highlight
+require "mason".setup()
 require 'treesitter-context'.setup {
     enable = true,            -- Enable this plugin (Can be enabled/disabled later via commands)
     multiwindow = false,      -- Enable multiwindow support.
@@ -216,75 +276,21 @@ require 'treesitter-context'.setup {
     on_attach = nil, -- (fun(buf: integer): boolean) return false to disable attaching
 }
 
-vim.api.nvim_create_autocmd('VimEnter', {
-    callback = function()
-        require "which-key".setup({
-            icons = {
-                mappings = vim.g.have_nerd_font,
-                keys = vim.g.have_nerd_font and {} or {
-                    Up = '<Up> ',
-                    Down = '<Down> ',
-                    Left = '<Left> ',
-                    Right = '<Right> ',
-                    C = '<C-…> ',
-                    M = '<M-…> ',
-                    D = '<D-…> ',
-                    S = '<S-…> ',
-                    CR = '<CR> ',
-                    Esc = '<Esc> ',
-                    ScrollWheelDown = '<ScrollWheelDown> ',
-                    ScrollWheelUp = '<ScrollWheelUp> ',
-                    NL = '<NL> ',
-                    BS = '<BS> ',
-                    Space = '<Space> ',
-                    Tab = '<Tab> ',
-                    F1 = '<F1>',
-                    F2 = '<F2>',
-                    F3 = '<F3>',
-                    F4 = '<F4>',
-                    F5 = '<F5>',
-                    F6 = '<F6>',
-                    F7 = '<F7>',
-                    F8 = '<F8>',
-                    F9 = '<F9>',
-                    F10 = '<F10>',
-                    F11 = '<F11>',
-                    F12 = '<F12>',
-                },
-            },
-
-            spec = {
-                { '<leader>c', group = '[C]ode',    mode = { 'n', 'x' } },
-                { '<leader>d', group = '[D]ocument' },
-                { '<leader>r', group = '[R]ename' },
-                { '<leader>s', group = '[S]earch' },
-                { '<leader>t', group = '[T]oggle' },
-            },
-
-            windows = {
-                position = "bottom",
-                winblend = 0,
-                width = vim.o.columns,
-            },
-
-        }
-        )
-    end
-})
-
-require "oil".setup({
-    default_file_explorer = true,
-    view_options = {
-        show_hidden = true,
-    }
-})
-
 require "blink.cmp".setup({
     completion = {
         keyword = { range = 'full' },
         accept = { auto_brackets = { enabled = true }, },
         ghost_text = { enabled = true },
         documentation = { auto_show = true, auto_show_delay_ms = 000 },
+
+        menu = {
+            draw = {
+                columns = {
+                    { "label",     "label_description", gap = 1 },
+                    { "kind_icon", "kind" }
+                },
+            }
+        }
     },
 
     sources = {
@@ -298,9 +304,6 @@ require "blink.cmp".setup({
 
 require('telescope').setup {
     defaults = {
-        --   mappings = {
-        --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-        --   },
         winblend = 0,
         file_ignore_patterns = {
             '*.import',
@@ -332,8 +335,6 @@ require('telescope').setup {
     pickers = {
         find_files = {
             hidden = true,
-            -- needed to exclude some files & dirs from general search
-            -- when not included or specified in .gitignore
             find_command = {
                 'rg',
                 '--files',
@@ -364,11 +365,10 @@ require('telescope').setup {
     },
 
 }
-
 require('telescope').load_extension('fzf')
 require('telescope').load_extension('ui-select')
 
-
+-- format on save
 vim.api.nvim_create_autocmd("BufWritePre", {
     callback = function(event)
         -- Use LSP formatting
@@ -379,8 +379,10 @@ vim.api.nvim_create_autocmd("BufWritePre", {
     end,
 })
 
+-- LSP map + inlay hints
 vim.api.nvim_create_autocmd("LspAttach", {
     callback = function(args)
+        -- inlay hints
         local client = vim.lsp.get_client_by_id(args.data.client_id)
         if client and client.server_capabilities.inlayHintProvider then
             vim.lsp.inlay_hint.enable(true, { bufnr = args.buf })
@@ -391,8 +393,8 @@ vim.api.nvim_create_autocmd("LspAttach", {
             vim.keymap.set(mode, keys, func, { buffer = args.buf, desc = 'LSP: ' .. desc })
         end
 
+        -- maps
         local builtin = require 'telescope.builtin'
-
         map('n', 'gd', builtin.lsp_definitions, '[G]oto [D]efinition')
         map('n', 'gr', builtin.lsp_references, '[G]oto [R]eferences')
         map('n', 'gI', builtin.lsp_implementations, '[G]oto [I]mplementation')
@@ -405,8 +407,14 @@ vim.api.nvim_create_autocmd("LspAttach", {
     end,
 })
 
--- local lspconfig = require("lspconfig")
+require('nvim-treesitter.configs').setup({
+    auto_install = true,
+    highlight = {
+        enable = true,
+    },
+})
 
+-- LPS
 vim.lsp.enable({
     "lua_ls",
     "svelte",
@@ -429,20 +437,48 @@ vim.lsp.enable({
     "dockerls",
     "templ",
     "markdown_oxide",
+    "fish",
 })
+
+-- colorscheme
+require("kanagawa").setup({
+    transparent = true,
+    background = {       -- map the value of 'background' option to a theme
+        dark = "dragon", -- try "dragon" !
+        light = "dragon"
+    },
+    terminalColors = true,
+    overrides = function(colors)
+        local theme = colors.theme
+        return {
+            Pmenu = { fg = theme.ui.shade0, bg = theme.ui.bg_p1 }, -- add `blend = vim.o.pumblend` to enable transparency
+            PmenuSel = { fg = "NONE", bg = theme.ui.bg_p2 },
+            PmenuSbar = { bg = theme.ui.bg_m1 },
+            PmenuThumb = { bg = theme.ui.bg_p2 },
+        }
+    end,
+})
+vim.cmd.colorscheme("kanagawa")
+vim.cmd(":hi statusline guibg=NONE")
+vim.cmd([[
+  highlight TelescopeNormal guibg=NONE
+  highlight TelescopeBorder guibg=NONE
+  highlight TelescopePromptNormal guibg=NONE
+  highlight TelescopePromptBorder guibg=NONE
+  highlight TelescopeResultsNormal guibg=NONE
+  highlight TelescopeResultsBorder guibg=NONE
+  highlight TelescopePreviewNormal guibg=NONE
+  highlight TelescopePreviewBorder guibg=NONE
+]])
+
 
 local map = function(mode, keys, func, desc)
     vim.keymap.set(mode, keys, func, { desc = desc })
 end
-
 map('n', '<Esc>', '<cmd>nohlsearch<CR>')
 map('n', '<leader>u', ':update<CR> :source<CR>', "[U]pdate config")
 map('n', '<leader>q', vim.diagnostic.setloclist, 'Open diagnostic [Q]uickfix list')
 map('t', '<Esc><Esc>', '<C-\\><C-n>', 'Exit terminal mode')
--- map('n', '<C-h>', '<C-w><C-h>', 'Move focus to the left window')
--- map('n', '<C-l>', '<C-w><C-l>', 'Move focus to the right window')
--- map('n', '<C-j>', '<C-w><C-j>', 'Move focus to the lower window')
--- map('n', '<C-k>', '<C-w><C-k>', 'Move focus to the upper window')
 map("n", "<C-h>", "<cmd>TmuxNavigateLeft<CR>", "Navigate Left (tmux)")
 map("n", "<C-j>", "<cmd>TmuxNavigateDown<CR>", "Navigate Down (tmux)")
 map("n", "<C-k>", "<cmd>TmuxNavigateUp<CR>", "Navigate Up (tmux)")
@@ -450,8 +486,9 @@ map("n", "<C-l>", "<cmd>TmuxNavigateRight<CR>", "Navigate Right (tmux)")
 map("n", "<C-\\>", "<cmd>TmuxNavigatePrevious<CR>", "Navigate Previous (tmux)")
 
 map({ 'n', 'v', 'x' }, '<leader>y', '"+y', "[Y]anking Global")
+map({ 'n', 'v', 'x' }, '<leader>p', '"+p', "[P]asting Global")
 map('n', '<leader>tb', ":%!xxd -r<CR>", "[B]inary")
-map('n', '<leader>te', ":%!xxd<CR>", "[H]ex")
+map('n', '<leader>th', ":%!xxd<CR>", "[H]ex")
 map('n', '<leader>te', ":Oil<CR>", "Open [E]xplorer")
 map('n', '<leader>tu', vim.cmd.UndotreeToggle, "Open [U]undotree")
 map('n', '<leader>tt', ":TypstPreview<CR>", "[T]ypstPreview")
@@ -476,21 +513,9 @@ map('n', '<leader>/', function()
         previewer = false,
     })
 end, '[/] Fuzzily search in current buffer')
-
-
-
 map('n', '<leader>s/', function()
     builtin.live_grep {
         grep_open_files = true,
         prompt_title = 'Live Grep in Open Files',
     }
 end, '[S]earch [/] in Open Files')
-
-
-
-require('nvim-treesitter.configs').setup({
-    auto_install = true,
-    highlight = {
-        enable = true,
-    },
-})
