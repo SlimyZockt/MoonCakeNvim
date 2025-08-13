@@ -21,6 +21,9 @@
 ---   capabilities = capabilities,
 --- })
 --- ```
+--- o
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+capabilities.textDocument.completion.completionItem.snippetSupport = true
 return {
   cmd = { 'vscode-html-language-server', '--stdio' },
   filetypes = { 'html', 'templ' },
@@ -31,4 +34,5 @@ return {
     embeddedLanguages = { css = true, javascript = true },
     configurationSection = { 'html', 'css', 'javascript' },
   },
+  capabilities = capabilities,
 }
