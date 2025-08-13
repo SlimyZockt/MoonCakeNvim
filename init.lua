@@ -3,7 +3,6 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 vim.g.guifont = 'JetBrainsMono NF'
 vim.g.have_nerd_font = true
-
 -- vim.g.indent_guide = true
 
 -- Enable break indent
@@ -326,42 +325,45 @@ require "blink.cmp".setup({
     fuzzy = { implementation = "lua" }
 })
 
-local rg = {
-    'rg',
-    '--follow',        -- Follow symbolic links
-    '--hidden',        -- Search for hidden files
-    '--no-heading',    -- Don't group matches by each file
-    '--with-filename', -- Print the file path with the matched lines
-    '--line-number',   -- Show line numbers
-    '--column',        -- Show column numbers
-    '--smart-case',    -- Smart case search
-
-    -- Exclude some patterns from search
-    '--glob=!**/.git/*',
-    '--glob=!**/.idea/*',
-    '--glob=!**/.vscode/*',
-    '--glob=!**/.godot/*',
-    '--glob=!**/build/*',
-    '--glob=!**/dist/*',
-    '--glob=!**/yarn.lock',
-    '--glob=!**/*.import',
-    '--glob=!**/*.uid',
-    '--glob=!**/flake.lock',
-    '--glob=!**/package-lock.json',
-}
 
 require('telescope').setup {
     defaults = {
-        winblend = 0,
+        --   mappings = {
+        --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
+        --   },
         file_ignore_patterns = {
             '*.import',
         },
+
         vimgrep_arguments = {
+            'rg',
+            '--follow',        -- Follow symbolic links
+            '--hidden',        -- Search for hidden files
+            '--no-heading',    -- Don't group matches by each file
+            '--with-filename', -- Print the file path with the matched lines
+            '--line-number',   -- Show line numbers
+            '--column',        -- Show column numbers
+            '--smart-case',    -- Smart case search
+
+            -- Exclude some patterns from search
+            '--glob=!**/.git/*',
+            '--glob=!**/.idea/*',
+            '--glob=!**/.vscode/*',
+            '--glob=!**/.godot/*',
+            '--glob=!**/build/*',
+            '--glob=!**/dist/*',
+            '--glob=!**/yarn.lock',
+            '--glob=!**/*.import',
+            '--glob=!**/flake.lock',
+            '--glob=!**/package-lock.json',
         },
     },
     pickers = {
         find_files = {
             hidden = true,
+
+            -- needed to exclude some files & dirs from general search
+            -- when not included or specified in .gitignore
             find_command = {
                 'rg',
                 '--files',
@@ -374,7 +376,6 @@ require('telescope').setup {
                 '--glob=!**/dist/*',
                 '--glob=!**/yarn.lock',
                 '--glob=!**/*.import',
-                '--glob=!**/*.uid',
                 '--glob=!**/flake.lock',
                 '--glob=!**/package-lock.json',
             },
