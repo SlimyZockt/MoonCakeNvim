@@ -1,9 +1,10 @@
 -- Global
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
-vim.g.guifont = 'JetBrainsMono Nerd Font'
+vim.g.guifont = 'JetBrainsMono NF'
 vim.g.have_nerd_font = true
-vim.g.indent_guide = true
+
+-- vim.g.indent_guide = true
 
 -- Enable break indent
 vim.opt.breakindent = true
@@ -18,13 +19,13 @@ vim.o.wrap = true
 vim.o.number = true
 vim.o.relativenumber = true
 vim.o.termguicolors = true
-vim.o.incsearch = true
 vim.o.signcolumn = "yes"
 vim.o.mouse = 'a'
 vim.o.cursorline = true
 vim.o.colorcolumn = '120'
 vim.o.scrolloff = 10
-vim.opt.completeopt = {}
+vim.opt.list = true
+vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣', leadmultispace = "»   " }
 -- Misc
 vim.o.swapfile = false
 vim.o.ignorecase = true
@@ -111,6 +112,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
         vim.highlight.on_yank()
     end,
 })
+
 vim.pack.add({
     -- Visual
     { src = "https://github.com/rebelot/kanagawa.nvim" },
@@ -122,6 +124,7 @@ vim.pack.add({
     { src = "https://github.com/nvim-treesitter/nvim-treesitter",          version = "main" },
     { src = "https://github.com/nvim-treesitter/nvim-treesitter-context" },
     { src = "https://github.com/mason-org/mason.nvim" },
+    { src = "https://github.com/mason-org/mason-lspconfig.nvim" },
     { src = "https://github.com/saghen/blink.cmp" },
     -- Mini Text editing
     { src = "https://github.com/echasnovski/mini.ai" },
@@ -151,6 +154,33 @@ vim.pack.add({
     -- Misc
     { src = "https://github.com/lambdalisue/vim-suda" },
 })
+
+-- colorscheme
+require("kanagawa").setup({
+    transparent = true,
+    background = {       -- map the value of 'background' option to a theme
+        dark = "dragon", -- try "dragon" !
+        light = "dragon"
+    },
+    terminalColors = true,
+    overrides = function(colors)
+        local theme = colors.theme
+        return {
+            Pmenu = { fg = theme.ui.shade0, bg = theme.ui.bg_p1 },
+            PmenuSel = { fg = "NONE", bg = theme.ui.bg_p2 },
+            PmenuSbar = { bg = theme.ui.bg_m1 },
+            PmenuThumb = { bg = theme.ui.bg_p2 },
+
+            NormalFloat = { bg = "none" },
+            FloatBorder = { bg = "none" },
+            FloatTitle = { bg = "none" },
+            NormalDark = { fg = theme.ui.fg_dim, bg = theme.ui.bg_m3 },
+            LazyNormal = { bg = theme.ui.bg_m3, fg = theme.ui.fg_dim },
+            MasonNormal = { bg = theme.ui.bg_m3, fg = theme.ui.fg_dim },
+        }
+    end,
+})
+vim.cmd.colorscheme("kanagawa")
 
 -- setup plugin
 for _, v in pairs(vim.pack.get()) do
@@ -186,7 +216,6 @@ require('mini.indentscope').setup({
         delay = 0,
         animation = require('mini.indentscope').gen_animation.none(),
     },
-
     symbol = '▎',
 })
 -- Icons
@@ -259,7 +288,6 @@ require "which-key".setup({
 })
 
 -- (auto completion)/highlight
-require "mason".setup()
 require 'treesitter-context'.setup {
     enable = true,            -- Enable this plugin (Can be enabled/disabled later via commands)
     multiwindow = false,      -- Enable multiwindow support.
@@ -282,7 +310,6 @@ require "blink.cmp".setup({
         accept = { auto_brackets = { enabled = true }, },
         ghost_text = { enabled = true },
         documentation = { auto_show = true, auto_show_delay_ms = 000 },
-
         menu = {
             draw = {
                 columns = {
@@ -292,15 +319,36 @@ require "blink.cmp".setup({
             }
         }
     },
-
     sources = {
         default = { 'lsp', 'path', 'snippets', 'buffer' },
     },
-
     signature = { enabled = true },
-
     fuzzy = { implementation = "lua" }
 })
+
+local rg = {
+    'rg',
+    '--follow',        -- Follow symbolic links
+    '--hidden',        -- Search for hidden files
+    '--no-heading',    -- Don't group matches by each file
+    '--with-filename', -- Print the file path with the matched lines
+    '--line-number',   -- Show line numbers
+    '--column',        -- Show column numbers
+    '--smart-case',    -- Smart case search
+
+    -- Exclude some patterns from search
+    '--glob=!**/.git/*',
+    '--glob=!**/.idea/*',
+    '--glob=!**/.vscode/*',
+    '--glob=!**/.godot/*',
+    '--glob=!**/build/*',
+    '--glob=!**/dist/*',
+    '--glob=!**/yarn.lock',
+    '--glob=!**/*.import',
+    '--glob=!**/*.uid',
+    '--glob=!**/flake.lock',
+    '--glob=!**/package-lock.json',
+}
 
 require('telescope').setup {
     defaults = {
@@ -308,29 +356,7 @@ require('telescope').setup {
         file_ignore_patterns = {
             '*.import',
         },
-
         vimgrep_arguments = {
-            'rg',
-            '--follow',        -- Follow symbolic links
-            '--hidden',        -- Search for hidden files
-            '--no-heading',    -- Don't group matches by each file
-            '--with-filename', -- Print the file path with the matched lines
-            '--line-number',   -- Show line numbers
-            '--column',        -- Show column numbers
-            '--smart-case',    -- Smart case search
-
-            -- Exclude some patterns from search
-            '--glob=!**/.git/*',
-            '--glob=!**/.idea/*',
-            '--glob=!**/.vscode/*',
-            '--glob=!**/.godot/*',
-            '--glob=!**/build/*',
-            '--glob=!**/dist/*',
-            '--glob=!**/yarn.lock',
-            '--glob=!**/*.import',
-            '--glob=!**/*.uid',
-            '--glob=!**/flake.lock',
-            '--glob=!**/package-lock.json',
         },
     },
     pickers = {
@@ -390,7 +416,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
             vim.lsp.inlay_hint.enable(true, { bufnr = args.buf })
         end
 
-
         local map = function(mode, keys, func, desc)
             vim.keymap.set(mode, keys, func, { buffer = args.buf, desc = 'LSP: ' .. desc })
         end
@@ -417,32 +442,20 @@ require('nvim-treesitter.configs').setup({
 })
 
 -- LPS
-require "lspconfig"
-vim.lsp.enable({
-    "lua_ls",
-    "svelte",
-    "tinymist",
-    "emmetls",
-    "gopls",
-    "ols",
-    "rust_analyzer",
-    "emmet_language_server",
-    "htmx",
-    "astro",
-    "pyright",
-    "tailwind",
-    "emmet_language_server",
-    "html",
-    "eslint",
-    "clangd",
-    "zls",
-    "tl_ls",
-    "dockerls",
-    "templ",
-    "markdown_oxide",
-    "fish",
-    "nixd",
-})
+local capabilities = require('blink.cmp').get_lsp_capabilities()
+require "mason".setup()
+require('mason-lspconfig').setup {
+    ensure_installed = {},
+    automatic_installation = false,
+    handlers = {
+        function(server_name)
+            local server = vim.lsp.config[server_name] or {}
+
+            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+            vim.lsp.config[server_name] = server
+        end,
+    },
+}
 
 local gdproject = io.open(vim.fn.getcwd() .. '/project.godot', 'r')
 if gdproject then
@@ -450,37 +463,6 @@ if gdproject then
     -- vim.fn.serverstart './godothost'
     vim.lsp.enable("gdscript")
 end
-
--- colorscheme
-require("kanagawa").setup({
-    transparent = true,
-    background = {       -- map the value of 'background' option to a theme
-        dark = "dragon", -- try "dragon" !
-        light = "dragon"
-    },
-    terminalColors = true,
-    overrides = function(colors)
-        local theme = colors.theme
-        return {
-            Pmenu = { fg = theme.ui.shade0, bg = theme.ui.bg_p1 }, -- add `blend = vim.o.pumblend` to enable transparency
-            PmenuSel = { fg = "NONE", bg = theme.ui.bg_p2 },
-            PmenuSbar = { bg = theme.ui.bg_m1 },
-            PmenuThumb = { bg = theme.ui.bg_p2 },
-        }
-    end,
-})
-vim.cmd.colorscheme("kanagawa")
-vim.cmd(":hi statusline guibg=NONE")
-vim.cmd([[
-  highlight TelescopeNormal guibg=NONE
-  highlight TelescopeBorder guibg=NONE
-  highlight TelescopePromptNormal guibg=NONE
-  highlight TelescopePromptBorder guibg=NONE
-  highlight TelescopeResultsNormal guibg=NONE
-  highlight TelescopeResultsBorder guibg=NONE
-  highlight TelescopePreviewNormal guibg=NONE
-  highlight TelescopePreviewBorder guibg=NONE
-]])
 
 
 local map = function(mode, keys, func, desc)
