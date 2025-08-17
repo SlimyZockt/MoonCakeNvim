@@ -35,7 +35,7 @@ vim.o.ignorecase = true
 vim.o.smartcase = true
 vim.o.updatetime = 250
 vim.o.timeoutlen = 300
-vim.o.confirm = true
+vim.o.confirm = false
 -- Configure how new splits should be opened
 vim.o.splitright = true
 vim.o.splitbelow = true
@@ -115,6 +115,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 vim.pack.add({
     -- Visual
     { src = "https://github.com/rebelot/kanagawa.nvim" },
+    { src = "https://github.com/vague2k/vague.nvim" },
     { src = "https://github.com/nvim-tree/nvim-web-devicons" },
     -- Trees
     { src = "https://github.com/mbbill/undotree" },
@@ -157,9 +158,9 @@ vim.pack.add({
 -- colorscheme
 require("kanagawa").setup({
     transparent = true,
-    background = {       -- map the value of 'background' option to a theme
-        dark = "dragon", -- try "dragon" !
-        light = "dragon"
+    theme = "dragon",
+    background = {
+        dark = "dragon",
     },
     terminalColors = true,
     overrides = function(colors)
@@ -170,16 +171,18 @@ require("kanagawa").setup({
             PmenuSbar = { bg = theme.ui.bg_m1 },
             PmenuThumb = { bg = theme.ui.bg_p2 },
 
-            NormalFloat = { bg = "none" },
-            FloatBorder = { bg = "none" },
-            FloatTitle = { bg = "none" },
-            NormalDark = { fg = theme.ui.fg_dim, bg = theme.ui.bg_m3 },
-            LazyNormal = { bg = theme.ui.bg_m3, fg = theme.ui.fg_dim },
-            MasonNormal = { bg = theme.ui.bg_m3, fg = theme.ui.fg_dim },
+            BlinkCmpMenu = { bg = colors.palette.dragonBlack3 },
+            BlinkCmpLabelDetail = { bg = colors.palette.dragonBlack3 },
+            BlinkCmpKind = { bg = "NONE" },
+            BlinkCmpMenuSelection = { bg = colors.palette.dragonBlue1 },
+            BlinkCmpKindVariable = { bg = colors.palette.dragonBlack3 },
         }
     end,
 })
-vim.cmd.colorscheme("kanagawa")
+require("vague").setup({
+    transparent = true,
+})
+vim.cmd.colorscheme("vague")
 
 -- setup plugin
 for _, v in pairs(vim.pack.get()) do
@@ -310,6 +313,7 @@ require "blink.cmp".setup({
         ghost_text = { enabled = true },
         documentation = { auto_show = true, auto_show_delay_ms = 000 },
         menu = {
+            winhighlight = "",
             draw = {
                 columns = {
                     { "label",     "label_description", gap = 1 },
@@ -318,8 +322,12 @@ require "blink.cmp".setup({
             }
         }
     },
+    appearance = {
+        nerd_font_variant = 'mono'
+    },
     sources = {
-        default = { 'lsp', 'path', 'snippets', 'buffer' },
+        -- 'snippets',
+        default = { 'lsp', 'path', 'buffer' },
     },
     signature = { enabled = true },
     fuzzy = { implementation = "lua" }
@@ -328,9 +336,6 @@ require "blink.cmp".setup({
 
 require('telescope').setup {
     defaults = {
-        --   mappings = {
-        --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-        --   },
         file_ignore_patterns = {
             '*.import',
         },
@@ -361,9 +366,6 @@ require('telescope').setup {
     pickers = {
         find_files = {
             hidden = true,
-
-            -- needed to exclude some files & dirs from general search
-            -- when not included or specified in .gitignore
             find_command = {
                 'rg',
                 '--files',
@@ -461,7 +463,6 @@ require('mason-lspconfig').setup {
 local gdproject = io.open(vim.fn.getcwd() .. '/project.godot', 'r')
 if gdproject then
     io.close(gdproject)
-    -- vim.fn.serverstart './godothost'
     vim.lsp.enable("gdscript")
 end
 
@@ -469,7 +470,10 @@ end
 local map = function(mode, keys, func, desc)
     vim.keymap.set(mode, keys, func, { desc = desc })
 end
-map('n', '<Esc>', '<cmd>nohlsearch<CR>')
+map('n', '<Esc>', function()
+    vim.cmd.nohlsearch()
+    vim.snippet.stop()
+end)
 map('n', '<leader>u', ':update<CR> :source<CR>', "[U]pdate config")
 map('n', '<leader>q', vim.diagnostic.setloclist, 'Open diagnostic [Q]uickfix list')
 map('t', '<Esc><Esc>', '<C-\\><C-n>', 'Exit terminal mode')
