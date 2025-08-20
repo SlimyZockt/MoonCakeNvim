@@ -3,7 +3,7 @@
 
 local palette = {
     base00 = "#1A1818",
-    base01 = "#0D0C0C",
+    base01 = "#282727",
     base02 = "#727169",
     base03 = "#727169",
     base04 = "#C8C093",
