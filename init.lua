@@ -114,8 +114,6 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 
 vim.pack.add({
     -- Visual
-    { src = "https://github.com/rebelot/kanagawa.nvim" },
-    { src = "https://github.com/vague2k/vague.nvim" },
     { src = "https://github.com/nvim-tree/nvim-web-devicons" },
     -- Trees
     { src = "https://github.com/mbbill/undotree" },
@@ -140,6 +138,7 @@ vim.pack.add({
     { src = "https://github.com/echasnovski/mini.statusline" },
     { src = "https://github.com/echasnovski/mini.indentscope" },
     { src = "https://github.com/echasnovski/mini.hipatterns" },
+    { src = "https://github.com/echasnovski/mini.base16" },
     -- Telescope
     { src = "https://github.com/nvim-telescope/telescope.nvim" },
     { src = "https://github.com/nvim-lua/plenary.nvim" },
@@ -155,34 +154,7 @@ vim.pack.add({
     { src = "https://github.com/lambdalisue/vim-suda" },
 })
 
--- colorscheme
-require("kanagawa").setup({
-    transparent = true,
-    theme = "dragon",
-    background = {
-        dark = "dragon",
-    },
-    terminalColors = true,
-    overrides = function(colors)
-        local theme = colors.theme
-        return {
-            Pmenu = { fg = theme.ui.shade0, bg = theme.ui.bg_p1 },
-            PmenuSel = { fg = "NONE", bg = theme.ui.bg_p2 },
-            PmenuSbar = { bg = theme.ui.bg_m1 },
-            PmenuThumb = { bg = theme.ui.bg_p2 },
-
-            BlinkCmpMenu = { bg = colors.palette.dragonBlack3 },
-            BlinkCmpLabelDetail = { bg = colors.palette.dragonBlack3 },
-            BlinkCmpKind = { bg = "NONE" },
-            BlinkCmpMenuSelection = { bg = colors.palette.dragonBlue1 },
-            BlinkCmpKindVariable = { bg = colors.palette.dragonBlack3 },
-        }
-    end,
-})
-require("vague").setup({
-    transparent = true,
-})
-vim.cmd.colorscheme("vague")
+vim.cmd.colorscheme "kanagawa-mooncake"
 
 -- setup plugin
 for _, v in pairs(vim.pack.get()) do
@@ -204,7 +176,7 @@ require "mini.move".setup()
 require "mini.splitjoin".setup()
 require 'mini.operators'.setup()
 require 'mini.bracketed'.setup()
-require 'mini.hipatterns'.setup({
+require 'mini.hipatterns'.setup {
     highlighters = {
         fixme     = { pattern = '%f[%w]()FIXME()%f[%W]', group = 'MiniHipatternsFixme' },
         hack      = { pattern = '%f[%w]()HACK()%f[%W]', group = 'MiniHipatternsHack' },
@@ -212,34 +184,35 @@ require 'mini.hipatterns'.setup({
         note      = { pattern = '%f[%w]()NOTE()%f[%W]', group = 'MiniHipatternsNote' },
         hex_color = require 'mini.hipatterns'.gen_highlighter.hex_color(),
     },
-})
+}
 require('mini.indentscope').setup({
     draw = {
         delay = 0,
         animation = require('mini.indentscope').gen_animation.none(),
     },
-    symbol = '▎',
+    -- symbol = '▎',
+    symbol = '»',
 })
 -- Icons
 require "nvim-web-devicons".setup()
 -- Preview
 require "typst-preview".setup()
-require "markview".setup({
+require "markview".setup {
     preview = {
         icon_provider = "mini", -- "mini" or "devicons"
     }
-})
+}
 
 --- file explorer
-require "oil".setup({
+require "oil".setup {
     default_file_explorer = true,
     view_options = {
         show_hidden = true,
     }
-})
+}
 
 -- which-key
-require "which-key".setup({
+require "which-key".setup {
     icons = {
         mappings = vim.g.have_nerd_font,
         keys = vim.g.have_nerd_font and {} or {
@@ -287,7 +260,7 @@ require "which-key".setup({
         winblend = 0,
         width = vim.o.columns,
     },
-})
+}
 
 -- (auto completion)/highlight
 require 'treesitter-context'.setup {
@@ -306,7 +279,7 @@ require 'treesitter-context'.setup {
     on_attach = nil, -- (fun(buf: integer): boolean) return false to disable attaching
 }
 
-require "blink.cmp".setup({
+require "blink.cmp".setup {
     completion = {
         keyword = { range = 'full' },
         accept = { auto_brackets = { enabled = true }, },
@@ -331,7 +304,7 @@ require "blink.cmp".setup({
     },
     signature = { enabled = true },
     fuzzy = { implementation = "lua" }
-})
+}
 
 
 require('telescope').setup {
@@ -396,17 +369,17 @@ require('telescope').setup {
     },
 
 }
-require('telescope').load_extension('fzf')
-require('telescope').load_extension('ui-select')
+require 'telescope'.load_extension 'fzf'
+require 'telescope'.load_extension 'ui-select'
 
 -- format on save
 vim.api.nvim_create_autocmd("BufWritePre", {
     callback = function(event)
         -- Use LSP formatting
-        vim.lsp.buf.format({
+        vim.lsp.buf.format {
             async = true,
             bufnr = event.buf
-        })
+        }
     end,
 })
 
@@ -437,12 +410,12 @@ vim.api.nvim_create_autocmd("LspAttach", {
     end,
 })
 
-require('nvim-treesitter.configs').setup({
+require('nvim-treesitter.configs').setup {
     auto_install = true,
     highlight = {
         enable = true,
     },
-})
+}
 
 -- LPS
 local capabilities = require('blink.cmp').get_lsp_capabilities()
@@ -466,6 +439,7 @@ if gdproject then
     vim.lsp.enable("gdscript")
 end
 
+vim.lsp.enable { "nixd" }
 
 local map = function(mode, keys, func, desc)
     vim.keymap.set(mode, keys, func, { desc = desc })
@@ -506,7 +480,7 @@ map('n', '<leader>sr', builtin.resume, '[S]earch [R]esume')
 map('n', '<leader>s.', builtin.oldfiles, '[S]earch Recent Files ("." for repeat)')
 map('n', '<leader><leader>', builtin.buffers, '[ ] Find existing buffers')
 map('n', '<leader>/', function()
-    builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
+    builtin.current_buffer_fuzzy_find(require 'telescope.themes'.get_dropdown {
         winblend = 0,
         previewer = false,
     })
