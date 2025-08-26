@@ -480,7 +480,7 @@ map('n', '<leader>sr', builtin.resume, '[S]earch [R]esume')
 map('n', '<leader>s.', builtin.oldfiles, '[S]earch Recent Files ("." for repeat)')
 map('n', '<leader><leader>', builtin.buffers, '[ ] Find existing buffers')
 map('n', '<leader>/', function()
-    builtin.current_buffer_fuzzy_find(require 'telescope.themes'.get_dropdown {
+    builtin.current_buffer_fuzzy_find(require'telescope.themes'.get_dropdown {
         winblend = 0,
         previewer = false,
     })
