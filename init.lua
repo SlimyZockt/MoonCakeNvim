@@ -438,13 +438,16 @@ require('mason-lspconfig').setup {
         "eslint",
         "clangd",
         "zls",
-        "tl_ls",
+        "ts_ls",
         "dockerls",
         "templ",
         "markdown_oxide",
         -- "fish-lsp",
     },
-    automatic_installation = false,
+    automatic_enable = {
+        exclude = { "clangd" },
+    },
+    automatic_installation = true,
     handlers = {
         function(server_name)
             local server = vim.lsp.config[server_name] or {}
