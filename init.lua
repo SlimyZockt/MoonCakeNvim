@@ -112,6 +112,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
     end,
 })
 
+
 vim.pack.add({
     -- Visual
     { src = "https://github.com/nvim-tree/nvim-web-devicons" },
@@ -138,7 +139,7 @@ vim.pack.add({
     { src = "https://github.com/echasnovski/mini.statusline" },
     { src = "https://github.com/echasnovski/mini.indentscope" },
     { src = "https://github.com/echasnovski/mini.hipatterns" },
-    { src = "https://github.com/echasnovski/mini.base16" },
+    -- { src = "https://github.com/echasnovski/mini.base16" },
     -- Telescope
     { src = "https://github.com/nvim-telescope/telescope.nvim" },
     { src = "https://github.com/nvim-lua/plenary.nvim" },
@@ -306,7 +307,6 @@ require "blink.cmp".setup {
     fuzzy = { implementation = "lua" }
 }
 
-
 require('telescope').setup {
     defaults = {
         file_ignore_patterns = {
@@ -410,18 +410,40 @@ vim.api.nvim_create_autocmd("LspAttach", {
     end,
 })
 
-require('nvim-treesitter.configs').setup {
-    auto_install = true,
-    highlight = {
-        enable = true,
-    },
-}
+-- require('nvim-treesitter.configs').setup {
+--     auto_install = true,
+--     highlight = {
+--         enable = true,
+--     },
+-- }
+
 
 -- LPS
 local capabilities = require('blink.cmp').get_lsp_capabilities()
 require "mason".setup()
 require('mason-lspconfig').setup {
-    ensure_installed = {},
+    ensure_installed = {
+        "lua_ls",
+        "svelte",
+        "tinymist",
+        "gopls",
+        "ols",
+        "rust_analyzer",
+        "htmx",
+        "astro",
+        "pyright",
+        "tailwindcss",
+        "emmet_language_server",
+        "html",
+        "eslint",
+        "clangd",
+        "zls",
+        "tl_ls",
+        "dockerls",
+        "templ",
+        "markdown_oxide",
+        -- "fish-lsp",
+    },
     automatic_installation = false,
     handlers = {
         function(server_name)
@@ -480,7 +502,7 @@ map('n', '<leader>sr', builtin.resume, '[S]earch [R]esume')
 map('n', '<leader>s.', builtin.oldfiles, '[S]earch Recent Files ("." for repeat)')
 map('n', '<leader><leader>', builtin.buffers, '[ ] Find existing buffers')
 map('n', '<leader>/', function()
-    builtin.current_buffer_fuzzy_find(require'telescope.themes'.get_dropdown {
+    builtin.current_buffer_fuzzy_find(require 'telescope.themes'.get_dropdown {
         winblend = 0,
         previewer = false,
     })
