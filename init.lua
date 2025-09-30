@@ -151,8 +151,10 @@ vim.pack.add({
     { src = "https://github.com/folke/which-key.nvim" },
     { src = "https://github.com/OXY2DEV/markview.nvim" },
     { src = "https://github.com/chomosuke/typst-preview.nvim" },
-    -- Misc
+    -- Sudo files
     { src = "https://github.com/lambdalisue/vim-suda" },
+    -- Wiki
+    { src = "https://github.com/vimwiki/vimwiki" },
 })
 
 vim.cmd.colorscheme "kanagawa-mooncake"
@@ -444,6 +446,7 @@ require('mason-lspconfig').setup {
         "markdown_oxide",
         -- "fish-lsp",
     },
+    -- automatic_enable = true,
     automatic_enable = {
         exclude = { "clangd" },
     },
@@ -473,6 +476,7 @@ map('n', '<Esc>', function()
     vim.cmd.nohlsearch()
     vim.snippet.stop()
 end)
+map('n', 'M', ":Man <CR>", "[M]an page")
 map('n', '<leader>u', ':update<CR> :source<CR>', "[U]pdate config")
 map('n', '<leader>q', vim.diagnostic.setloclist, 'Open diagnostic [Q]uickfix list')
 map('t', '<Esc><Esc>', '<C-\\><C-n>', 'Exit terminal mode')
