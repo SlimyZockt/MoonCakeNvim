@@ -17,16 +17,16 @@ local palette = {
     base0C = "#8BA4B0",
     base0D = "#8BA4B0",
     base0E = "#A292A3",
-    base0F = "#A6A69C"
+    base0F = "#A6A69C",
 }
 
 require("mini.base16").setup({
     palette = palette,
     use_cterm = true,
+    transparent = true,
     plugins = {
         default = true,
     }
-
 })
 
 

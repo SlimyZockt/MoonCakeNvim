@@ -1,0 +1,37 @@
+{
+  "plugins": {
+    "blink.cmp": [],
+    "markview.nvim": [],
+    "mason-lspconfig.nvim": [],
+    "mason.nvim": [],
+    "mini.ai": [],
+    "mini.base16": [],
+    "mini.bracketed": [],
+    "mini.hipatterns": [],
+    "mini.icons": [],
+    "mini.indentscope": [],
+    "mini.move": [],
+    "mini.operators": [],
+    "mini.pairs": [],
+    "mini.splitjoin": [],
+    "mini.statusline": [],
+    "mini.surround": [],
+    "nvim-lspconfig": [],
+    "nvim-treesitter": {
+      "version": "'main'"
+    },
+    "nvim-treesitter-context": [],
+    "nvim-web-devicons": [],
+    "oil.nvim": [],
+    "plenary.nvim": [],
+    "telescope-fzf-native.nvim": [],
+    "telescope-ui-select.nvim": [],
+    "telescope.nvim": [],
+    "typst-preview.nvim": [],
+    "undotree": [],
+    "vim-suda": [],
+    "vim-tmux-navigator": [],
+    "vimwiki": [],
+    "which-key.nvim": []
+  }
+}

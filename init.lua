@@ -3,7 +3,6 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 vim.g.guifont = 'JetBrainsMono NF'
 vim.g.have_nerd_font = true
--- vim.g.indent_guide = true
 
 -- Enable break indent
 vim.opt.breakindent = true
@@ -53,6 +52,9 @@ vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
 vim.o.foldlevel = 99
 vim.o.foldlevelstart = 99
 vim.o.foldnestmax = 20
+
+-- Ctags
+vim.g.tags = vim.fn.stdpath('config') .. '/system_tags,tags'
 
 -- save Folds
 local group = vim.api.nvim_create_augroup("remember_folds", { clear = true })
@@ -112,7 +114,6 @@ vim.api.nvim_create_autocmd('TextYankPost', {
     end,
 })
 
-
 vim.pack.add({
     -- Visual
     { src = "https://github.com/nvim-tree/nvim-web-devicons" },
@@ -124,6 +125,7 @@ vim.pack.add({
     { src = "https://github.com/nvim-treesitter/nvim-treesitter-context" },
     { src = "https://github.com/mason-org/mason.nvim" },
     { src = "https://github.com/mason-org/mason-lspconfig.nvim" },
+    { src = "https://github.com/neovim/nvim-lspconfig" },
     { src = "https://github.com/saghen/blink.cmp" },
     -- Mini Text editing
     { src = "https://github.com/echasnovski/mini.ai" },
@@ -139,7 +141,7 @@ vim.pack.add({
     { src = "https://github.com/echasnovski/mini.statusline" },
     { src = "https://github.com/echasnovski/mini.indentscope" },
     { src = "https://github.com/echasnovski/mini.hipatterns" },
-    -- { src = "https://github.com/echasnovski/mini.base16" },
+    { src = "https://github.com/SlimyZockt/mini.base16" },
     -- Telescope
     { src = "https://github.com/nvim-telescope/telescope.nvim" },
     { src = "https://github.com/nvim-lua/plenary.nvim" },
@@ -211,7 +213,10 @@ require "oil".setup {
     default_file_explorer = true,
     view_options = {
         show_hidden = true,
-    }
+    },
+    confirmation = {
+        border = "single",
+    },
 }
 
 -- which-key
@@ -303,7 +308,10 @@ require "blink.cmp".setup {
     },
     sources = {
         -- 'snippets',
-        default = { 'lsp', 'path', 'buffer' },
+        default = { 'lsp', 'path', 'buffer', 'omni' },
+        providers = {
+            buffer = {},
+        },
     },
     signature = { enabled = true },
     fuzzy = { implementation = "lua" }
@@ -412,40 +420,85 @@ vim.api.nvim_create_autocmd("LspAttach", {
     end,
 })
 
--- require('nvim-treesitter.configs').setup {
---     auto_install = true,
---     highlight = {
---         enable = true,
---     },
--- }
+local lsps = {
+    lua_ls = {
+        settings = {
+            Lua = {
+                hint = {
+                    enable = true,
+                },
+            },
+        },
+    },
+    svelte = {},
+    tinymist = {},
+    gopls = {
+        settings = {
+            gopls = {
+                hints = {
+                    rangeVariableTypes = true,
+                    parameterNames = true,
+                    constantValues = true,
+                    assignVariableTypes = true,
+                    compositeLiteralFields = true,
+                    compositeLiteralTypes = true,
+                    functionTypeParameters = true,
+                },
+            },
+        },
 
+    },
+    ols = {
+        init_options = {
+            enable_inlay_hints = true,
+            enable_checker_only_saved = false,
+            verbose = true,
+            enable_fake_methods = true,
+            enable_procedure_snippet = true,
+            enable_rename = true,
+            enable_references = true,
+            enable_document_symbols = true,
+            checker_args = '-strict-style -vet',
+        },
+    },
+    rust_analyzer = {},
+    htmx = {
+        filetypes = { 'aspnetcorerazor', 'astro', 'astro-markdown', 'blade', 'clojure', 'django-html', 'htmldjango', 'edge', 'eelixir', 'elixir', 'ejs', 'erb', 'eruby', 'gohtml', 'gohtmltmpl', 'haml', 'handlebars', 'hbs', 'html', 'htmlangular', 'html-eex', 'heex', 'jade', 'leaf', 'liquid', 'markdown', 'mdx', 'mustache', 'njk', 'nunjucks', 'php', 'razor', 'slim', 'twig', 'javascript', 'javascriptreact', 'reason', 'rescript', 'typescript', 'typescriptreact', 'vue', 'svelte', 'templ', },
+    },
+    astro = {},
+    pyright = {},
+    tailwindcss = {
+        filetypes = { 'aspnetcorerazor', 'astro', 'astro-markdown', 'blade', 'clojure', 'django-html', 'htmldjango', 'edge', 'eelixir', 'elixir', 'ejs', 'erb', 'eruby', 'gohtml', 'gohtmltmpl', 'haml', 'handlebars', 'hbs', 'html', 'htmlangular', 'html-eex', 'heex', 'jade', 'leaf', 'liquid', 'markdown', 'mdx', 'mustache', 'njk', 'nunjucks', 'php', 'razor', 'slim', 'twig', 'javascript', 'javascriptreact', 'reason', 'rescript', 'typescript', 'typescriptreact', 'vue', 'svelte', 'templ', },
+    },
+    emmet_language_server = { 'astro', 'css', 'eruby', 'html', 'htmlangular', 'htmldjango', 'javascriptreact', 'less', 'pug', 'sass', 'scss', 'svelte', 'templ', 'typescriptreact', 'vue', },
+    html = { filetypes = { 'html', 'templ' }, },
+    eslint = {},
+    clangd = {},
+    zls = {},
+    ts_ls = {},
+    jdtls = {
+        root_markers = {
+            'settings.gradle',
+            'settings.gradle.kts',
+            'pom.xml',
+            'build.gradle',
+            'mvnw',
+            'gradlew',
+            'build.gradle',
+            'build.gradle.kts',
+            -- '.git',
+        },
+    },
+    dockerls = {},
+    templ = {},
+    markdown_oxide = {},
+}
 
 -- LPS
 local capabilities = require('blink.cmp').get_lsp_capabilities()
 require "mason".setup()
 require('mason-lspconfig').setup {
-    ensure_installed = {
-        "lua_ls",
-        "svelte",
-        "tinymist",
-        "gopls",
-        "ols",
-        "rust_analyzer",
-        "htmx",
-        "astro",
-        "pyright",
-        "tailwindcss",
-        "emmet_language_server",
-        "html",
-        "eslint",
-        "clangd",
-        "zls",
-        "ts_ls",
-        "dockerls",
-        "templ",
-        "markdown_oxide",
-        -- "fish-lsp",
-    },
+    ensure_installed = vim.tbl_keys(lsps),
     -- automatic_enable = true,
     automatic_enable = {
         exclude = { "clangd" },
@@ -455,7 +508,13 @@ require('mason-lspconfig').setup {
         function(server_name)
             local server = vim.lsp.config[server_name] or {}
 
-            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+            server.capabilities = vim.tbl_deep_extend(
+                'force',
+                {},
+                capabilities,
+                server.capabilities or {},
+                lsps[server_name]
+            )
             vim.lsp.config[server_name] = server
         end,
     },
@@ -466,8 +525,6 @@ if gdproject then
     io.close(gdproject)
     vim.lsp.enable("gdscript")
 end
-
-vim.lsp.enable { "nixd" }
 
 local map = function(mode, keys, func, desc)
     vim.keymap.set(mode, keys, func, { desc = desc })
