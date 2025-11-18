@@ -114,6 +114,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
     end,
 })
 
+
 vim.pack.add({
     -- Visual
     { src = "https://github.com/nvim-tree/nvim-web-devicons" },
@@ -216,6 +217,20 @@ require "oil".setup {
     },
     confirmation = {
         border = "single",
+    },
+
+    spec = {
+        { '<leader>c', group = '[C]ode',    mode = { 'n', 'x' } },
+        { '<leader>d', group = '[D]ocument' },
+        { '<leader>r', group = '[R]ename' },
+        { '<leader>s', group = '[S]earch' },
+        { '<leader>t', group = '[T]oggle' },
+    },
+
+    windows = {
+        position = "bottom",
+        winblend = 0,
+        width = vim.o.columns,
     },
 }
 
