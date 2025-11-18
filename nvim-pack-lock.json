@@ -5,7 +5,10 @@
     "mason-lspconfig.nvim": [],
     "mason.nvim": [],
     "mini.ai": [],
-    "mini.base16": [],
+    "mini.base16": {
+      "rev": "d21e238",
+      "src": "https://github.com/SlimyZockt/mini.base16"
+    },
     "mini.bracketed": [],
     "mini.hipatterns": [],
     "mini.icons": [],
