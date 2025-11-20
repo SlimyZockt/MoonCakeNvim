@@ -24,6 +24,7 @@ vim.o.colorcolumn = '120'
 vim.o.scrolloff = 10
 vim.opt.list = true
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣', leadmultispace = "»   " }
+vim.o.inccommand = 'split'
 -- Misc
 vim.o.swapfile = false
 vim.o.ignorecase = true
@@ -128,6 +129,7 @@ vim.pack.add({
     { src = "https://github.com/mason-org/mason-lspconfig.nvim" },
     { src = "https://github.com/neovim/nvim-lspconfig" },
     { src = "https://github.com/saghen/blink.cmp" },
+    { src = "https://github.com/yioneko/nvim-vtsls" },
     -- Mini Text editing
     { src = "https://github.com/echasnovski/mini.ai" },
     { src = "https://github.com/echasnovski/mini.surround" },
@@ -137,6 +139,7 @@ vim.pack.add({
     { src = "https://github.com/echasnovski/mini.operators" },
     -- Mini Workflow
     { src = "https://github.com/echasnovski/mini.bracketed" },
+    { src = "https://github.com/echasnovski/mini.snippets" },
     -- Mini Appearance
     { src = "https://github.com/echasnovski/mini.icons" },
     { src = "https://github.com/echasnovski/mini.statusline" },
@@ -172,6 +175,8 @@ for _, v in pairs(vim.pack.get()) do
     end
 end
 
+vim.lsp.vtsls = require("vtsls").lspconfig -- set default server config, optional but recommended
+
 -- Mini
 require "mini.ai".setup()
 require "mini.icons".setup()
@@ -182,6 +187,12 @@ require "mini.move".setup()
 require "mini.splitjoin".setup()
 require 'mini.operators'.setup()
 require 'mini.bracketed'.setup()
+local gen_loader = require('mini.snippets').gen_loader
+require 'mini.snippets'.setup({
+    snippets = {
+        gen_loader.from_lang(),
+    },
+})
 require 'mini.hipatterns'.setup {
     highlighters = {
         fixme     = { pattern = '%f[%w]()FIXME()%f[%W]', group = 'MiniHipatternsFixme' },
@@ -303,34 +314,25 @@ require 'treesitter-context'.setup {
 }
 
 require "blink.cmp".setup {
+    cmdline = { enabled = false },
     completion = {
         keyword = { range = 'full' },
         accept = { auto_brackets = { enabled = true }, },
         ghost_text = { enabled = true },
         documentation = { auto_show = true, auto_show_delay_ms = 000 },
-        menu = {
-            winhighlight = "",
-            draw = {
-                columns = {
-                    { "label",     "label_description", gap = 1 },
-                    { "kind_icon", "kind" }
-                },
-            }
-        }
     },
     appearance = {
         nerd_font_variant = 'mono'
     },
     sources = {
-        -- 'snippets',
-        default = { 'lsp', 'path', 'buffer', 'omni' },
-        providers = {
-            buffer = {},
-        },
+        default = { 'lsp', 'path', 'buffer', 'snippets' },
     },
+    snippets = { preset = 'default' },
+    -- snippets = { preset = 'mini_snippets' },
     signature = { enabled = true },
     fuzzy = { implementation = "lua" }
 }
+
 
 require('telescope').setup {
     defaults = {
@@ -435,7 +437,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
     end,
 })
 
-local lsps = {
+local servers = {
     lua_ls = {
         settings = {
             Lua = {
@@ -486,11 +488,46 @@ local lsps = {
         filetypes = { 'aspnetcorerazor', 'astro', 'astro-markdown', 'blade', 'clojure', 'django-html', 'htmldjango', 'edge', 'eelixir', 'elixir', 'ejs', 'erb', 'eruby', 'gohtml', 'gohtmltmpl', 'haml', 'handlebars', 'hbs', 'html', 'htmlangular', 'html-eex', 'heex', 'jade', 'leaf', 'liquid', 'markdown', 'mdx', 'mustache', 'njk', 'nunjucks', 'php', 'razor', 'slim', 'twig', 'javascript', 'javascriptreact', 'reason', 'rescript', 'typescript', 'typescriptreact', 'vue', 'svelte', 'templ', },
     },
     emmet_language_server = { 'astro', 'css', 'eruby', 'html', 'htmlangular', 'htmldjango', 'javascriptreact', 'less', 'pug', 'sass', 'scss', 'svelte', 'templ', 'typescriptreact', 'vue', },
-    html = { filetypes = { 'html', 'templ' }, },
-    eslint = {},
-    clangd = {},
+    html = { filetypes = { 'html', 'templ', 'javascriptreact', 'typescriptreact' }, },
     zls = {},
-    ts_ls = {},
+    vtsls = {
+
+        filetypes = {
+            "javascript",
+            "javascriptreact",
+            "javascript.jsx",
+            "typescript",
+            "typescriptreact",
+            "typescript.tsx",
+        },
+        settings = {
+            complete_function_calls = true,
+            vtsls = {
+                enableMoveToFileCodeAction = true,
+                autoUseWorkspaceTsdk = true,
+                experimental = {
+                    maxInlayHintLength = 30,
+                    completion = {
+                        enableServerSideFuzzyMatch = true,
+                    },
+                },
+            },
+            typescript = {
+                updateImportsOnFileMove = { enabled = "always" },
+                suggest = {
+                    completeFunctionCalls = true,
+                },
+                inlayHints = {
+                    enumMemberValues = { enabled = true },
+                    functionLikeReturnTypes = { enabled = true },
+                    parameterNames = { enabled = "literals" },
+                    parameterTypes = { enabled = true },
+                    propertyDeclarationTypes = { enabled = true },
+                    variableTypes = { enabled = false },
+                },
+            },
+        },
+    },
     jdtls = {
         root_markers = {
             'settings.gradle',
@@ -504,36 +541,48 @@ local lsps = {
             -- '.git',
         },
     },
-    dockerls = {},
     templ = {},
     markdown_oxide = {},
 }
 
 -- LPS
-local capabilities = require('blink.cmp').get_lsp_capabilities()
+
+local ensure_installed = vim.tbl_keys(servers or {})
 require "mason".setup()
-require('mason-lspconfig').setup {
-    ensure_installed = vim.tbl_keys(lsps),
-    -- automatic_enable = true,
-    automatic_enable = {
-        exclude = { "clangd" },
-    },
-    automatic_installation = true,
+
+local capabilities = require('blink.cmp').get_lsp_capabilities()
+require("mason-lspconfig").setup {
+    ensure_installed = ensure_installed,
+    automatic_enable = true,
     handlers = {
         function(server_name)
-            local server = vim.lsp.config[server_name] or {}
+            local server = vim.tbl_deep_extend(
+                'force',
+                {},
+                vim.lsp.config[server_name] or {},
+                servers[server_name]
+            )
 
             server.capabilities = vim.tbl_deep_extend(
                 'force',
                 {},
                 capabilities,
-                server.capabilities or {},
-                lsps[server_name]
+                server.capabilities or {}
             )
             vim.lsp.config[server_name] = server
         end,
     },
 }
+
+vim.lsp.config.ctags_lsp = {
+    cmd = { "ctags-lsp" },
+    filetypes = { "c", "cpp" },
+    root_dir = vim.uv.cwd(),
+}
+
+vim.lsp.enable("ctags_lsp")
+
+-- require('typescript-tools').setup {}
 
 local gdproject = io.open(vim.fn.getcwd() .. '/project.godot', 'r')
 if gdproject then
