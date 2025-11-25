@@ -2,23 +2,24 @@
 -- Requires: echasnovski/mini.base16
 
 local palette = {
-    base00 = "#1A1818",
+    base00 = "#1a1818",
     base01 = "#282727",
     base02 = "#727169",
     base03 = "#727169",
-    base04 = "#C8C093",
-    base05 = "#A6A69C",
-    base06 = "#8BA4B0",
-    base07 = "#AaC093",
-    base08 = "#C4B28A",
-    base09 = "#B6927B",
-    base0A = "#8EA4A2",
-    base0B = "#8A9A7B",
-    base0C = "#8BA4B0",
-    base0D = "#8BA4B0",
-    base0E = "#A292A3",
-    base0F = "#A6A69C",
+    base04 = "#c8c093",
+    base05 = "#a6a69c",
+    base06 = "#8ba4b0",
+    base07 = "#a6a69c",
+    base08 = "#c4b28a",
+    base09 = "#b6927b",
+    base0A = "#8ea4a2",
+    base0B = "#8a9a7b",
+    base0C = "#8ba4b0",
+    base0D = "#8ba4b0",
+    base0E = "#a292a3",
+    base0F = "#a6a69c",
 }
+
 
 require("mini.base16").setup({
     palette = palette,

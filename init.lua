@@ -546,32 +546,33 @@ local servers = {
 }
 
 -- LPS
+local server_list = vim.tbl_keys(servers or {})
+local capabilities = require('blink.cmp').get_lsp_capabilities()
 
-local ensure_installed = vim.tbl_keys(servers or {})
+for _, server_name in ipairs(server_list) do
+    local server = vim.tbl_deep_extend(
+        'force',
+        {},
+        vim.lsp.config[server_name] or {},
+        servers[server_name]
+    )
+
+    server.capabilities = vim.tbl_deep_extend(
+        'force',
+        {},
+        capabilities,
+        server.capabilities or {}
+    )
+
+    vim.lsp.config(server_name, server)
+end
+
+vim.lsp.enable(server_list)
 require "mason".setup()
 
-local capabilities = require('blink.cmp').get_lsp_capabilities()
 require("mason-lspconfig").setup {
-    ensure_installed = ensure_installed,
-    automatic_enable = true,
-    handlers = {
-        function(server_name)
-            local server = vim.tbl_deep_extend(
-                'force',
-                {},
-                vim.lsp.config[server_name] or {},
-                servers[server_name]
-            )
-
-            server.capabilities = vim.tbl_deep_extend(
-                'force',
-                {},
-                capabilities,
-                server.capabilities or {}
-            )
-            vim.lsp.config[server_name] = server
-        end,
-    },
+    ensure_installed = server_list,
+    automatic_enable = false,
 }
 
 vim.lsp.config.ctags_lsp = {
@@ -581,8 +582,6 @@ vim.lsp.config.ctags_lsp = {
 }
 
 vim.lsp.enable("ctags_lsp")
-
--- require('typescript-tools').setup {}
 
 local gdproject = io.open(vim.fn.getcwd() .. '/project.godot', 'r')
 if gdproject then
