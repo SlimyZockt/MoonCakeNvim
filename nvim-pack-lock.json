@@ -1,7 +1,7 @@
 {
   "plugins": {
     "blink.cmp": {
-      "rev": "b19413d",
+      "rev": "6a4914c",
       "src": "https://github.com/saghen/blink.cmp"
     },
     "friendly-snippets": {
@@ -9,11 +9,11 @@
       "src": "https://github.com/rafamadriz/friendly-snippets"
     },
     "markview.nvim": {
-      "rev": "86fcabc",
+      "rev": "18fc148",
       "src": "https://github.com/OXY2DEV/markview.nvim"
     },
     "mason-lspconfig.nvim": {
-      "rev": "b1d9a91",
+      "rev": "fe661093f4b05136437b531e7f959af2a2ae66c8",
       "src": "https://github.com/mason-org/mason-lspconfig.nvim"
     },
     "mason-tool-installer.nvim": {
@@ -21,15 +21,15 @@
       "src": "https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim"
     },
     "mason.nvim": {
-      "rev": "57e5a8a",
+      "rev": "44d1e90e1f66e077268191e3ee9d2ac97cc18e65",
       "src": "https://github.com/mason-org/mason.nvim"
     },
     "mini.ai": {
-      "rev": "0d3c9cf",
+      "rev": "bfb26d9072670c3aaefab0f53024b2f3729c8083",
       "src": "https://github.com/echasnovski/mini.ai"
     },
     "mini.base16": {
-      "rev": "d21e238",
+      "rev": "de6e2bd5128cf4d80fccd8c83b11309048071979",
       "src": "https://github.com/SlimyZockt/mini.base16"
     },
     "mini.bracketed": {
@@ -37,31 +37,43 @@
       "src": "https://github.com/echasnovski/mini.bracketed"
     },
     "mini.completion": {
-      "rev": "7c5edfc",
+      "rev": "4d451f8",
       "src": "https://github.com/echasnovski/mini.completion"
+    },
+    "mini.cursorword": {
+      "rev": "dda0f57d55bb1fa19423b7201b2ba892c7d2bb3c",
+      "src": "https://github.com/echasnovski/mini.cursorword"
     },
     "mini.hipatterns": {
       "rev": "add8d8a",
       "src": "https://github.com/echasnovski/mini.hipatterns"
     },
     "mini.icons": {
-      "rev": "ff2e4f1",
+      "rev": "efc85e4",
       "src": "https://github.com/echasnovski/mini.icons"
     },
     "mini.indentscope": {
       "rev": "0308f94",
       "src": "https://github.com/echasnovski/mini.indentscope"
     },
+    "mini.jump": {
+      "rev": "99799e8ca33fe936b81a70b5ab9a081f8794c8a1",
+      "src": "https://github.com/echasnovski/mini.jump"
+    },
+    "mini.jump2d": {
+      "rev": "d840881f8e0489bd6f792b25d72bea5f6bc1812b",
+      "src": "https://github.com/echasnovski/mini.jump2d"
+    },
     "mini.move": {
       "rev": "4d21420",
       "src": "https://github.com/echasnovski/mini.move"
     },
     "mini.operators": {
-      "rev": "59f5fdb",
+      "rev": "47e33fe",
       "src": "https://github.com/echasnovski/mini.operators"
     },
     "mini.pairs": {
-      "rev": "b316e68",
+      "rev": "d5a29b6254dad07757832db505ea5aeab9aad43a",
       "src": "https://github.com/echasnovski/mini.pairs"
     },
     "mini.snippets": {
@@ -73,24 +85,24 @@
       "src": "https://github.com/echasnovski/mini.splitjoin"
     },
     "mini.statusline": {
-      "rev": "1491990",
+      "rev": "3e96596",
       "src": "https://github.com/echasnovski/mini.statusline"
     },
     "mini.surround": {
-      "rev": "88c5229",
+      "rev": "cc7b9d0",
       "src": "https://github.com/echasnovski/mini.surround"
     },
     "nvim-lspconfig": {
-      "rev": "d4f77e7",
+      "rev": "92ee7d42320edfbb81f3cad851314ab197fa324a",
       "src": "https://github.com/neovim/nvim-lspconfig"
     },
     "nvim-treesitter": {
-      "rev": "c682a239",
+      "rev": "5a7e5638e7d220575b1c22c8a2e099b52231886e",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter",
       "version": "'main'"
     },
     "nvim-treesitter-context": {
-      "rev": "660861b",
+      "rev": "64dd4cf3f6fd0ab17622c5ce15c91fc539c3f24a",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter-context"
     },
     "nvim-vtsls": {
@@ -98,11 +110,11 @@
       "src": "https://github.com/yioneko/nvim-vtsls"
     },
     "nvim-web-devicons": {
-      "rev": "8dcb311",
+      "rev": "6788013",
       "src": "https://github.com/nvim-tree/nvim-web-devicons"
     },
     "oil.nvim": {
-      "rev": "7e1cd77",
+      "rev": "81b8a91",
       "src": "https://github.com/stevearc/oil.nvim"
     },
     "plenary.nvim": {
@@ -118,7 +130,7 @@
       "src": "https://github.com/nvim-telescope/telescope-ui-select.nvim"
     },
     "telescope.nvim": {
-      "rev": "83a3a71",
+      "rev": "3333a52",
       "src": "https://github.com/nvim-telescope/telescope.nvim"
     },
     "typescript-tools.nvim": {
@@ -126,11 +138,11 @@
       "src": "https://github.com/pmizio/typescript-tools.nvim"
     },
     "typst-preview.nvim": {
-      "rev": "64469f8",
+      "rev": "bf5d5ea",
       "src": "https://github.com/chomosuke/typst-preview.nvim"
     },
     "undotree": {
-      "rev": "0f1c981",
+      "rev": "178d19e",
       "src": "https://github.com/mbbill/undotree"
     },
     "vim-suda": {

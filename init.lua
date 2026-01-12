@@ -139,7 +139,9 @@ vim.pack.add({
     { src = "https://github.com/echasnovski/mini.operators" },
     -- Mini Workflow
     { src = "https://github.com/echasnovski/mini.bracketed" },
-    { src = "https://github.com/echasnovski/mini.snippets" },
+    { src = "https://github.com/echasnovski/mini.jump" },
+    { src = "https://github.com/echasnovski/mini.jump2d" },
+    -- { src = "https://github.com/echasnovski/mini.snippets" },
     -- Mini Appearance
     { src = "https://github.com/echasnovski/mini.icons" },
     { src = "https://github.com/echasnovski/mini.statusline" },
@@ -187,12 +189,9 @@ require "mini.move".setup()
 require "mini.splitjoin".setup()
 require 'mini.operators'.setup()
 require 'mini.bracketed'.setup()
-local gen_loader = require('mini.snippets').gen_loader
-require 'mini.snippets'.setup({
-    snippets = {
-        gen_loader.from_lang(),
-    },
-})
+require 'mini.jump'.setup()
+require 'mini.jump2d'.setup()
+-- local gen_loader = require('mini.snippets').gen_loader
 require 'mini.hipatterns'.setup {
     highlighters = {
         fixme     = { pattern = '%f[%w]()FIXME()%f[%W]', group = 'MiniHipatternsFixme' },
@@ -325,10 +324,9 @@ require "blink.cmp".setup {
         nerd_font_variant = 'mono'
     },
     sources = {
-        default = { 'lsp', 'path', 'buffer', 'snippets' },
+        default = { 'lsp', 'path', 'buffer', 'snippets', 'omni' },
     },
     snippets = { preset = 'default' },
-    -- snippets = { preset = 'mini_snippets' },
     signature = { enabled = true },
     fuzzy = { implementation = "lua" }
 }
@@ -467,15 +465,23 @@ local servers = {
     },
     ols = {
         init_options = {
-            enable_inlay_hints = true,
-            enable_checker_only_saved = false,
-            verbose = true,
-            enable_fake_methods = true,
-            enable_procedure_snippet = true,
-            enable_rename = true,
-            enable_references = true,
+            enable_inlay_hints_params = false,
+            enable_inlay_hints_default_params = true,
+            enable_inlay_hints_implicit_return = true,
+
             enable_document_symbols = true,
+            enable_fake_methods = true,
+            enable_references = true,
+            enable_rename = true,
+            enable_procedure_snippet = true,
+            enable_snippets = true,
+            enable_auto_import = true,
+            enable_comp_lit_signature_help = true,
+            enable_semantic_tokens = true,
+
+            enable_checker_only_saved = false,
             checker_args = '-strict-style -vet',
+            verbose = false,
         },
     },
     rust_analyzer = {},
@@ -550,12 +556,13 @@ local server_list = vim.tbl_keys(servers or {})
 local capabilities = require('blink.cmp').get_lsp_capabilities()
 
 for _, server_name in ipairs(server_list) do
-    local server = vim.tbl_deep_extend(
-        'force',
-        {},
-        vim.lsp.config[server_name] or {},
-        servers[server_name]
-    )
+    local server =
+        vim.tbl_deep_extend(
+            'force',
+            {},
+            vim.lsp.config[server_name] or {},
+            servers[server_name]
+        )
 
     server.capabilities = vim.tbl_deep_extend(
         'force',
@@ -563,7 +570,6 @@ for _, server_name in ipairs(server_list) do
         capabilities,
         server.capabilities or {}
     )
-
     vim.lsp.config(server_name, server)
 end
 
@@ -576,8 +582,10 @@ require("mason-lspconfig").setup {
 }
 
 vim.lsp.config.ctags_lsp = {
-    cmd = { "ctags-lsp" },
-    filetypes = { "c", "cpp" },
+    cmd = {
+        "ctags-lsp",
+    },
+    filetypes = { "c", "cpp","h", "hpp" },
     root_dir = vim.uv.cwd(),
 }
 
