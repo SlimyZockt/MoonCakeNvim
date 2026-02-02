@@ -70,7 +70,7 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
     callback = function()
         local ft = vim.bo.filetype
         if ft ~= "TelescopePrompt" and vim.bo.buftype == "" then
-            vim.cmd("silent! loadview")
+            pcall(function() vim.cmd("silent! loadview") end)
         end
     end,
 })
@@ -404,7 +404,7 @@ vim.api.nvim_create_autocmd("BufWritePre", {
     callback = function(event)
         -- Use LSP formatting
         vim.lsp.buf.format {
-            async = true,
+            async = false,
             bufnr = event.buf
         }
     end,
@@ -471,17 +471,15 @@ local servers = {
             enable_inlay_hints_default_params = false,
             enable_inlay_hints_implicit_return = true,
 
-            enable_document_symbols = true,
             enable_fake_methods = true,
-            enable_references = true,
-            enable_rename = true,
-            enable_procedure_snippet = true,
+            enable_overload_resolution = true,
             enable_snippets = true,
             enable_auto_import = true,
             enable_comp_lit_signature_help = true,
+            enable_comp_lit_signature_help_use_docs = true,
             enable_semantic_tokens = true,
 
-            enable_checker_only_saved = false,
+            enable_checker_only_saved = true,
             checker_args = '-strict-style -vet',
             verbose = false,
         },
@@ -490,7 +488,7 @@ local servers = {
     htmx = {
         filetypes = { 'aspnetcorerazor', 'astro', 'astro-markdown', 'blade', 'clojure', 'django-html', 'htmldjango', 'edge', 'eelixir', 'elixir', 'ejs', 'erb', 'eruby', 'gohtml', 'gohtmltmpl', 'haml', 'handlebars', 'hbs', 'html', 'htmlangular', 'html-eex', 'heex', 'jade', 'leaf', 'liquid', 'markdown', 'mdx', 'mustache', 'njk', 'nunjucks', 'php', 'razor', 'slim', 'twig', 'javascript', 'javascriptreact', 'reason', 'rescript', 'typescript', 'typescriptreact', 'vue', 'svelte', 'templ', },
     },
-    astro = {},
+    -- astro = {},
     pyright = {},
     tailwindcss = {
         filetypes = { 'aspnetcorerazor', 'astro', 'astro-markdown', 'blade', 'clojure', 'django-html', 'htmldjango', 'edge', 'eelixir', 'elixir', 'ejs', 'erb', 'eruby', 'gohtml', 'gohtmltmpl', 'haml', 'handlebars', 'hbs', 'html', 'htmlangular', 'html-eex', 'heex', 'jade', 'leaf', 'liquid', 'markdown', 'mdx', 'mustache', 'njk', 'nunjucks', 'php', 'razor', 'slim', 'twig', 'javascript', 'javascriptreact', 'reason', 'rescript', 'typescript', 'typescriptreact', 'vue', 'svelte', 'templ', },
@@ -561,24 +559,21 @@ local servers = {
 local server_list = vim.tbl_keys(servers or {})
 local capabilities = require('blink.cmp').get_lsp_capabilities()
 
-for _, server_name in ipairs(server_list) do
-    local server =
-        vim.tbl_deep_extend(
-            'force',
-            {},
-            vim.lsp.config[server_name] or {},
-            servers[server_name]
-        )
+for server_name, server_opts in pairs(servers) do
+    -- Ensure server_opts is a table
+    server_opts = server_opts or {}
 
-    server.capabilities = vim.tbl_deep_extend(
+    -- Merge capabilities
+    server_opts.capabilities = vim.tbl_deep_extend(
         'force',
-        {},
         capabilities,
-        server.capabilities or {}
+        server_opts.capabilities or {}
     )
-    vim.lsp.config(server_name, server)
-end
 
+    -- Specifically for 'ols', ensure init_options is passed correctly
+    -- Many LSPs (like ols) prefer 'init_options' over 'settings'
+    vim.lsp.config(server_name, server_opts)
+end
 vim.lsp.enable(server_list)
 require "mason".setup()
 
@@ -595,7 +590,7 @@ vim.lsp.config.ctags_lsp = {
         '--languages=+C,+C++',
         '--ctags-args="ctags --kinds-C=+fpstgve --kinds-C++=+cpstgve --fields=+Snl --extras=+q --sort=yes --tag-relative=yes"'
     },
-    filetypes = { "c", "cpp", "h", "hpp" },
+    filetypes = { "c", "cpp" },
     root_dir = vim.uv.cwd(),
 }
 vim.lsp.enable("ctags_lsp")
