@@ -31,7 +31,6 @@ vim.o.ignorecase = true
 vim.o.smartindent = true
 vim.o.showmode = false
 vim.o.undofile = true
-vim.o.ignorecase = true
 vim.o.smartcase = true
 vim.o.updatetime = 250
 vim.o.timeoutlen = 300
@@ -39,9 +38,6 @@ vim.o.confirm = false
 -- Configure how new splits should be opened
 vim.o.splitright = true
 vim.o.splitbelow = true
-
--- Preview substitutions live, as you type!
-vim.opt.inccommand = 'split'
 
 -- spell
 vim.o.spell = true
@@ -125,6 +121,7 @@ vim.pack.add({
     -- ( auto completion )/highlight
     { src = "https://github.com/nvim-treesitter/nvim-treesitter",          version = "main" },
     { src = "https://github.com/nvim-treesitter/nvim-treesitter-context" },
+    -- { src = "https://github.com/lewis6991/nvim-treesitter-context" },
     { src = "https://github.com/mason-org/mason.nvim" },
     { src = "https://github.com/mason-org/mason-lspconfig.nvim" },
     { src = "https://github.com/neovim/nvim-lspconfig" },
@@ -140,7 +137,6 @@ vim.pack.add({
     -- Mini Workflow
     { src = "https://github.com/echasnovski/mini.bracketed" },
     { src = "https://github.com/echasnovski/mini.jump" },
-    { src = "https://github.com/echasnovski/mini.jump2d" },
     -- { src = "https://github.com/echasnovski/mini.snippets" },
     -- Mini Appearance
     { src = "https://github.com/echasnovski/mini.icons" },
@@ -190,7 +186,7 @@ require "mini.splitjoin".setup()
 require 'mini.operators'.setup()
 require 'mini.bracketed'.setup()
 require 'mini.jump'.setup()
-require 'mini.jump2d'.setup()
+-- require 'mini.jump2d'.setup()
 -- local gen_loader = require('mini.snippets').gen_loader
 require 'mini.hipatterns'.setup {
     highlighters = {
@@ -295,21 +291,27 @@ require "which-key".setup {
     },
 }
 
+require('nvim-treesitter').setup {
+    auto_install = true,
+}
+
 -- (auto completion)/highlight
 require 'treesitter-context'.setup {
-    enable = true,            -- Enable this plugin (Can be enabled/disabled later via commands)
-    multiwindow = false,      -- Enable multiwindow support.
-    max_lines = 0,            -- How many lines the window should span. Values <= 0 mean no limit.
-    min_window_height = 0,    -- Minimum editor window height to enable context. Values <= 0 mean no limit.
-    line_numbers = true,
-    multiline_threshold = 20, -- Maximum number of lines to show for a single context
-    trim_scope = 'outer',     -- Which context lines to discard if `max_lines` is exceeded. Choices: 'inner', 'outer'
-    mode = 'cursor',          -- Line used to calculate context. Choices: 'cursor', 'topline'
-    -- Separator between context and content. Should be a single character string, like '-'.
-    -- When separator is set, the context will only show up when there are at least 2 lines above cursorline.
-    separator = nil,
-    zindex = 20,     -- The Z-index of the context window
-    on_attach = nil, -- (fun(buf: integer): boolean) return false to disable attaching
+    -- enable = true, -- Enable this plugin
+    -- max_lines = 2, -- How many lines the window should span.
+    -- min_window_height = 0,
+    -- line_numbers = true,
+    -- multiline_threshold = 1,
+    -- trim_scope = 'outer',
+    -- mode = 'cursor',
+    separator = '─',
+    -- patterns = {
+    --     default = {
+    --         'function',
+    --         'class',
+    --         'method',
+    --     },
+    -- },
 }
 
 require "blink.cmp".setup {
@@ -466,7 +468,7 @@ local servers = {
     ols = {
         init_options = {
             enable_inlay_hints_params = false,
-            enable_inlay_hints_default_params = true,
+            enable_inlay_hints_default_params = false,
             enable_inlay_hints_implicit_return = true,
 
             enable_document_symbols = true,
@@ -495,7 +497,11 @@ local servers = {
     },
     emmet_language_server = { 'astro', 'css', 'eruby', 'html', 'htmlangular', 'htmldjango', 'javascriptreact', 'less', 'pug', 'sass', 'scss', 'svelte', 'templ', 'typescriptreact', 'vue', },
     html = { filetypes = { 'html', 'templ', 'javascriptreact', 'typescriptreact' }, },
-    zls = {},
+    zls = {
+        settings = {
+            enable_argument_placeholders = false,
+        }
+    },
     vtsls = {
 
         filetypes = {
@@ -581,15 +587,19 @@ require("mason-lspconfig").setup {
     automatic_enable = false,
 }
 
+-- vim.lsp.config.ccls = {}
+-- vim.lsp.enable("ccls")
 vim.lsp.config.ctags_lsp = {
     cmd = {
-        "ctags-lsp",
+        'ctags-lsp',
+        '--languages=+C,+C++',
+        '--ctags-args="ctags --kinds-C=+fpstgve --kinds-C++=+cpstgve --fields=+Snl --extras=+q --sort=yes --tag-relative=yes"'
     },
-    filetypes = { "c", "cpp","h", "hpp" },
+    filetypes = { "c", "cpp", "h", "hpp" },
     root_dir = vim.uv.cwd(),
 }
-
 vim.lsp.enable("ctags_lsp")
+
 
 local gdproject = io.open(vim.fn.getcwd() .. '/project.godot', 'r')
 if gdproject then
@@ -613,6 +623,15 @@ map("n", "<C-j>", "<cmd>TmuxNavigateDown<CR>", "Navigate Down (tmux)")
 map("n", "<C-k>", "<cmd>TmuxNavigateUp<CR>", "Navigate Up (tmux)")
 map("n", "<C-l>", "<cmd>TmuxNavigateRight<CR>", "Navigate Right (tmux)")
 map("n", "<C-\\>", "<cmd>TmuxNavigatePrevious<CR>", "Navigate Previous (tmux)")
+
+vim.keymap.set("n", "<leader>z", "ccZZZ(Abdul)<Esc>gcc", { desc = "Comment Sleep", remap = true })
+vim.keymap.set("n", "<S-O>", "O<ESC>")
+
+map("n", "<C-n>", ":cnext<CR>", "Quick Fix next")
+map("n", "<C-p>", ":cprev<CR>", "Quick Fix previous")
+
+map({ 'n', 'v', 'x' }, '<leader>y', '"+y', "[Y]anking Global")
+map({ 'n', 'v', 'x' }, '<leader>p', '"+p', "[P]asting Global")
 
 map({ 'n', 'v', 'x' }, '<leader>y', '"+y', "[Y]anking Global")
 map({ 'n', 'v', 'x' }, '<leader>p', '"+p', "[P]asting Global")
