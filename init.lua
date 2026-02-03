@@ -582,8 +582,6 @@ require("mason-lspconfig").setup {
     automatic_enable = false,
 }
 
--- vim.lsp.config.ccls = {}
--- vim.lsp.enable("ccls")
 vim.lsp.config.ctags_lsp = {
     cmd = {
         'ctags-lsp',
@@ -624,6 +622,14 @@ vim.keymap.set("n", "<S-O>", "O<ESC>")
 
 map("n", "<C-n>", ":cnext<CR>", "Quick Fix next")
 map("n", "<C-p>", ":cprev<CR>", "Quick Fix previous")
+
+map("n", "<A-n>", function()
+    vim.diagnostic.jump({ count = 1 })
+end, "Diagnostic next")
+
+map("n", "<A-p>", function()
+    vim.diagnostic.jump({ count = -1 })
+end, "Diagnostic previous")
 
 map({ 'n', 'v', 'x' }, '<leader>y', '"+y', "[Y]anking Global")
 map({ 'n', 'v', 'x' }, '<leader>p', '"+p', "[P]asting Global")
