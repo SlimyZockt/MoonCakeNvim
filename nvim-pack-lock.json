@@ -4,6 +4,14 @@
       "rev": "b137f63d89d0285ca76eed12e1923220e0aff8c1",
       "src": "https://github.com/saghen/blink.cmp"
     },
+    "brk.nvim": {
+      "rev": "e5b8701e7f8b7071e662b117c288bc28819922a3",
+      "src": "https://codeberg.org/kafva/brk.nvim"
+    },
+    "conform.nvim": {
+      "rev": "c2526f1cde528a66e086ab1668e996d162c75f4f",
+      "src": "https://github.com/stevearc/conform.nvim"
+    },
     "friendly-snippets": {
       "rev": "6cd7280adead7f586db6fccbd15d2cac7e2188b9",
       "src": "https://github.com/rafamadriz/friendly-snippets"
@@ -76,6 +84,10 @@
       "rev": "4089aa6ea6423e02e1a8326a7a7a00159f6f5e04",
       "src": "https://github.com/echasnovski/mini.pairs"
     },
+    "mini.sessions": {
+      "rev": "e4890a2cecfbb35d9ecc8449568d41b1d30cb358",
+      "src": "https://github.com/nvim-mini/mini.sessions"
+    },
     "mini.snippets": {
       "rev": "b4065ca",
       "src": "https://github.com/echasnovski/mini.snippets"
@@ -96,6 +108,10 @@
       "rev": "54baa4beeeabed24be24379d5b3ce402fe7b5208",
       "src": "https://github.com/neovim/nvim-lspconfig"
     },
+    "nvim-origami": {
+      "rev": "4a76d70a23b59ec082eb370821cd33d988d99568",
+      "src": "https://github.com/chrisgrieser/nvim-origami"
+    },
     "nvim-treesitter": {
       "rev": "f8bbc3177d929dc86e272c41cc15219f0a7aa1ac",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter",
@@ -104,6 +120,10 @@
     "nvim-treesitter-context": {
       "rev": "64dd4cf3f6fd0ab17622c5ce15c91fc539c3f24a",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter-context"
+    },
+    "nvim-ufo": {
+      "rev": "ab3eb124062422d276fae49e0dd63b3ad1062cfc",
+      "src": "https://github.com/kevinhwang91/nvim-ufo"
     },
     "nvim-vtsls": {
       "rev": "0b5f73c",
@@ -120,6 +140,10 @@
     "plenary.nvim": {
       "rev": "b9fd522",
       "src": "https://github.com/nvim-lua/plenary.nvim"
+    },
+    "promise-async": {
+      "rev": "119e8961014c9bfaf1487bf3c2a393d254f337e2",
+      "src": "https://github.com/kevinhwang91/promise-async"
     },
     "telescope-fzf-native.nvim": {
       "rev": "6fea601",

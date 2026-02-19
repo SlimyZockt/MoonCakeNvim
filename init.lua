@@ -43,37 +43,25 @@ vim.o.splitbelow = true
 vim.o.spell = true
 vim.o.spelllang = 'en_us,de_de'
 
--- Add better fold support
-vim.o.foldmethod = 'expr'
-vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
 vim.o.foldlevel = 99
 vim.o.foldlevelstart = 99
-vim.o.foldnestmax = 20
+vim.o.viewoptions = "cursor,curdir,folds"
+
+vim.api.nvim_create_autocmd({ "BufWinLeave" }, {
+    pattern = { "*.*" },
+    desc = "Save view (folds) when closing file",
+    command = "mkview"
+})
+
+vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
+    pattern = { "*.*" },
+    desc = "Load view (folds) when opening file",
+    command = "silent! loadview"
+})
 
 -- Ctags
 vim.g.tags = vim.fn.stdpath('config') .. '/system_tags,tags'
 
--- save Folds
-local group = vim.api.nvim_create_augroup("remember_folds", { clear = true })
-vim.api.nvim_create_autocmd("BufWinLeave", {
-    group = group,
-    callback = function()
-        local ft = vim.bo.filetype
-        if ft ~= "TelescopePrompt" and vim.bo.buftype == "" then
-            vim.cmd("silent! mkview")
-        end
-    end,
-})
-
-vim.api.nvim_create_autocmd("BufWinEnter", {
-    group = group,
-    callback = function()
-        local ft = vim.bo.filetype
-        if ft ~= "TelescopePrompt" and vim.bo.buftype == "" then
-            pcall(function() vim.cmd("silent! loadview") end)
-        end
-    end,
-})
 -- diagnostic
 vim.diagnostic.config {
     severity_sort = true,
@@ -113,6 +101,8 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 
 
 vim.pack.add({
+    -- Misc
+    { src = "https://github.com/kevinhwang91/promise-async" },
     -- Visual
     { src = "https://github.com/nvim-tree/nvim-web-devicons" },
     -- Trees
@@ -121,28 +111,27 @@ vim.pack.add({
     -- ( auto completion )/highlight
     { src = "https://github.com/nvim-treesitter/nvim-treesitter",          version = "main" },
     { src = "https://github.com/nvim-treesitter/nvim-treesitter-context" },
-    -- { src = "https://github.com/lewis6991/nvim-treesitter-context" },
     { src = "https://github.com/mason-org/mason.nvim" },
     { src = "https://github.com/mason-org/mason-lspconfig.nvim" },
     { src = "https://github.com/neovim/nvim-lspconfig" },
     { src = "https://github.com/saghen/blink.cmp" },
     { src = "https://github.com/yioneko/nvim-vtsls" },
     -- Mini Text editing
-    { src = "https://github.com/echasnovski/mini.ai" },
-    { src = "https://github.com/echasnovski/mini.surround" },
-    { src = "https://github.com/echasnovski/mini.pairs" },
-    { src = "https://github.com/echasnovski/mini.move" },
-    { src = "https://github.com/echasnovski/mini.splitjoin" },
-    { src = "https://github.com/echasnovski/mini.operators" },
+    { src = "https://github.com/nvim-mini/mini.ai" },
+    { src = "https://github.com/nvim-mini/mini.surround" },
+    { src = "https://github.com/nvim-mini/mini.pairs" },
+    { src = "https://github.com/nvim-mini/mini.move" },
+    { src = "https://github.com/nvim-mini/mini.splitjoin" },
+    { src = "https://github.com/nvim-mini/mini.operators" },
     -- Mini Workflow
-    { src = "https://github.com/echasnovski/mini.bracketed" },
-    { src = "https://github.com/echasnovski/mini.jump" },
-    -- { src = "https://github.com/echasnovski/mini.snippets" },
+    { src = "https://github.com/nvim-mini/mini.bracketed" },
+    { src = "https://github.com/nvim-mini/mini.jump" },
+    -- { src = "https://github.com/nvim-mini/mini.snippets" },
     -- Mini Appearance
-    { src = "https://github.com/echasnovski/mini.icons" },
-    { src = "https://github.com/echasnovski/mini.statusline" },
-    { src = "https://github.com/echasnovski/mini.indentscope" },
-    { src = "https://github.com/echasnovski/mini.hipatterns" },
+    { src = "https://github.com/nvim-mini/mini.icons" },
+    { src = "https://github.com/nvim-mini/mini.statusline" },
+    { src = "https://github.com/nvim-mini/mini.indentscope" },
+    { src = "https://github.com/nvim-mini/mini.hipatterns" },
     { src = "https://github.com/SlimyZockt/mini.base16" },
     -- Telescope
     { src = "https://github.com/nvim-telescope/telescope.nvim" },
@@ -151,6 +140,7 @@ vim.pack.add({
     { src = "https://github.com/nvim-telescope/telescope-fzf-native.nvim", build = 'make' },
     -- Navigation
     { src = "https://github.com/christoomey/vim-tmux-navigator" },
+    { src = "https://github.com/kevinhwang91/nvim-ufo" },
     -- Preview
     { src = "https://github.com/folke/which-key.nvim" },
     { src = "https://github.com/OXY2DEV/markview.nvim" },
@@ -197,14 +187,14 @@ require 'mini.hipatterns'.setup {
         hex_color = require 'mini.hipatterns'.gen_highlighter.hex_color(),
     },
 }
-require('mini.indentscope').setup({
+require 'mini.indentscope'.setup {
     draw = {
         delay = 0,
         animation = require('mini.indentscope').gen_animation.none(),
     },
     -- symbol = '▎',
     symbol = '»',
-})
+}
 -- Icons
 require "nvim-web-devicons".setup()
 -- Preview
@@ -293,26 +283,30 @@ require "which-key".setup {
 
 require('nvim-treesitter').setup {
     auto_install = true,
+    folds = { enabled = true },
 }
 
 -- (auto completion)/highlight
 require 'treesitter-context'.setup {
-    -- enable = true, -- Enable this plugin
-    -- max_lines = 2, -- How many lines the window should span.
-    -- min_window_height = 0,
-    -- line_numbers = true,
-    -- multiline_threshold = 1,
-    -- trim_scope = 'outer',
-    -- mode = 'cursor',
     separator = '─',
-    -- patterns = {
-    --     default = {
-    --         'function',
-    --         'class',
-    --         'method',
-    --     },
-    -- },
 }
+
+-- format on save
+vim.api.nvim_create_autocmd("BufWritePre", {
+    callback = function(event)
+        -- Use LSP formatting
+        vim.lsp.buf.format {
+            async = false,
+            bufnr = event.buf
+        }
+    end,
+})
+
+require('ufo').setup({
+    provider_selector = function(bufnr, filetype, buftype)
+        return { 'treesitter', 'indent' }
+    end
+})
 
 require "blink.cmp".setup {
     cmdline = { enabled = false },
@@ -399,17 +393,6 @@ require('telescope').setup {
 require 'telescope'.load_extension 'fzf'
 require 'telescope'.load_extension 'ui-select'
 
--- format on save
-vim.api.nvim_create_autocmd("BufWritePre", {
-    callback = function(event)
-        -- Use LSP formatting
-        vim.lsp.buf.format {
-            async = false,
-            bufnr = event.buf
-        }
-    end,
-})
-
 -- LSP map + inlay hints
 vim.api.nvim_create_autocmd("LspAttach", {
     callback = function(args)
@@ -418,22 +401,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
         if client and client.server_capabilities.inlayHintProvider then
             vim.lsp.inlay_hint.enable(true, { bufnr = args.buf })
         end
-
-        local map = function(mode, keys, func, desc)
-            vim.keymap.set(mode, keys, func, { buffer = args.buf, desc = 'LSP: ' .. desc })
-        end
-
-        -- maps
-        local builtin = require 'telescope.builtin'
-        map('n', 'gd', builtin.lsp_definitions, '[G]oto [D]efinition')
-        map('n', 'gr', builtin.lsp_references, '[G]oto [R]eferences')
-        map('n', 'gI', builtin.lsp_implementations, '[G]oto [I]mplementation')
-        map('n', '<leader>D', builtin.lsp_type_definitions, 'Type [D]efinition')
-        map('n', '<leader>ds', builtin.lsp_document_symbols, '[D]ocument [S]ymbols')
-        map('n', '<leader>ws', builtin.lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
-        map('n', '<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
-        map({ 'n', 'x' }, '<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
-        map('n', 'gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
     end,
 })
 
@@ -607,43 +574,6 @@ map('n', '<Esc>', function()
     vim.cmd.nohlsearch()
     vim.snippet.stop()
 end)
-map('n', 'M', ":Man <CR>", "[M]an page")
-map('n', '<leader>u', ':update<CR> :source<CR>', "[U]pdate config")
-map('n', '<leader>q', vim.diagnostic.setloclist, 'Open diagnostic [Q]uickfix list')
-map('t', '<Esc><Esc>', '<C-\\><C-n>', 'Exit terminal mode')
-map("n", "<C-h>", "<cmd>TmuxNavigateLeft<CR>", "Navigate Left (tmux)")
-map("n", "<C-j>", "<cmd>TmuxNavigateDown<CR>", "Navigate Down (tmux)")
-map("n", "<C-k>", "<cmd>TmuxNavigateUp<CR>", "Navigate Up (tmux)")
-map("n", "<C-l>", "<cmd>TmuxNavigateRight<CR>", "Navigate Right (tmux)")
-map("n", "<C-\\>", "<cmd>TmuxNavigatePrevious<CR>", "Navigate Previous (tmux)")
-
-vim.keymap.set("n", "<leader>z", "ccZZZ(Abdul)<Esc>gcc", { desc = "Comment Sleep", remap = true })
-vim.keymap.set("n", "<S-O>", "O<ESC>")
-
-map("n", "<C-n>", ":cnext<CR>", "Quick Fix next")
-map("n", "<C-p>", ":cprev<CR>", "Quick Fix previous")
-
-map("n", "<A-n>", function()
-    vim.diagnostic.jump({ count = 1 })
-end, "Diagnostic next")
-
-map("n", "<A-p>", function()
-    vim.diagnostic.jump({ count = -1 })
-end, "Diagnostic previous")
-
-map({ 'n', 'v', 'x' }, '<leader>y', '"+y', "[Y]anking Global")
-map({ 'n', 'v', 'x' }, '<leader>p', '"+p', "[P]asting Global")
-
-map({ 'n', 'v', 'x' }, '<leader>y', '"+y', "[Y]anking Global")
-map({ 'n', 'v', 'x' }, '<leader>p', '"+p', "[P]asting Global")
-map('n', '<leader>tb', ":%!xxd -r<CR>", "[B]inary")
-map('n', '<leader>th', ":%!xxd<CR>", "[H]ex")
-map('n', '<leader>te', ":Oil<CR>", "Open [E]xplorer")
-map('n', '<leader>tu', vim.cmd.UndotreeToggle, "Open [U]undotree")
-map('n', '<leader>tt', ":TypstPreview<CR>", "[T]ypstPreview")
-map('n', '<leader>tm', ":Markview Toggle<CR>", "[M]arkview")
-
-map('n', '<leader>f', vim.lsp.buf.format, "[F]ormat")
 
 local builtin = require 'telescope.builtin'
 map('n', '<leader>sh', builtin.help_tags, '[S]earch [H]elp')
@@ -668,3 +598,51 @@ map('n', '<leader>s/', function()
         prompt_title = 'Live Grep in Open Files',
     }
 end, '[S]earch [/] in Open Files')
+map('n', 'gd', builtin.lsp_definitions, '[G]oto [D]efinition')
+map('n', 'gr', builtin.lsp_references, '[G]oto [R]eferences')
+map('n', 'gI', builtin.lsp_implementations, '[G]oto [I]mplementation')
+map('n', '<leader>D', builtin.lsp_type_definitions, 'Type [D]efinition')
+map('n', '<leader>ds', builtin.lsp_document_symbols, '[D]ocument [S]ymbols')
+map('n', '<leader>ws', builtin.lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
+map('n', '<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
+map({ 'n', 'x' }, '<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
+map('n', 'gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+
+map('n', 'M', ":Man <CR>", "[M]an page")
+map('n', '<leader>u', ':update<CR> :source<CR>', "[U]pdate config")
+map('n', '<leader>q', vim.diagnostic.setloclist, 'Open diagnostic [Q]uickfix list')
+map('t', '<Esc><Esc>', '<C-\\><C-n>', 'Exit terminal mode')
+map("n", "<C-h>", "<cmd>TmuxNavigateLeft<CR>", "Navigate Left (tmux)")
+map("n", "<C-j>", "<cmd>TmuxNavigateDown<CR>", "Navigate Down (tmux)")
+map("n", "<C-k>", "<cmd>TmuxNavigateUp<CR>", "Navigate Up (tmux)")
+map("n", "<C-l>", "<cmd>TmuxNavigateRight<CR>", "Navigate Right (tmux)")
+map("n", "<C-\\>", "<cmd>TmuxNavigatePrevious<CR>", "Navigate Previous (tmux)")
+
+vim.keymap.set("n", "<leader>z", "ccZZZ(Abdul)<Esc>gcc", { desc = "Comment Sleep", remap = true })
+vim.keymap.set("n", "<S-O>", "O<ESC>")
+
+map("n", "<C-n>", ":cnext<CR>", "Quick Fix next")
+map("n", "<C-p>", ":cprev<CR>", "Quick Fix previous")
+
+map("n", "<A-n>", function()
+    vim.diagnostic.jump({ count = 1 })
+end, "Diagnostic next")
+
+map("n", "<A-p>", function()
+    vim.diagnostic.jump({ count = -1 })
+end, "Diagnostic previous")
+
+map('n', '<leader>f', vim.lsp.buf.format, "[F]ormat")
+map("n", "zK", require("ufo").peekFoldedLinesUnderCursor, "Peek fold (ufo)")
+
+map({ 'n', 'v', 'x' }, '<leader>y', '"+y', "[Y]anking Global")
+map({ 'n', 'v', 'x' }, '<leader>p', '"+p', "[P]asting Global")
+
+map({ 'n', 'v', 'x' }, '<leader>y', '"+y', "[Y]anking Global")
+map({ 'n', 'v', 'x' }, '<leader>p', '"+p', "[P]asting Global")
+map('n', '<leader>tb', ":%!xxd -r<CR>", "[B]inary")
+map('n', '<leader>th', ":%!xxd<CR>", "[H]ex")
+map('n', '<leader>te', ":Oil<CR>", "Open [E]xplorer")
+map('n', '<leader>tu', vim.cmd.UndotreeToggle, "Open [U]undotree")
+map('n', '<leader>tt', ":TypstPreview<CR>", "[T]ypstPreview")
+map('n', '<leader>tm', ":Markview Toggle<CR>", "[M]arkview")
