@@ -553,7 +553,17 @@ vim.lsp.config.ctags_lsp = {
     cmd = {
         'ctags-lsp',
         '--languages=+C,+C++',
-        '--ctags-args="ctags --kinds-C=+fpstgve --kinds-C++=+cpstgve --fields=+Snl --extras=+q --sort=yes --tag-relative=yes"'
+        '--ctags-args="ctags \z
+        --kinds-C=+fpstgve  \z
+        --kinds-C++=+cpstgve \z
+        --fields-C=+{macrodef,properties} \z
+        --fields-C++=+{macrodef,properties} \z
+        --fields=+Snl \z
+        --extras=+q \z
+        --sort=yes  \z
+        --tag-relative=yes  \z
+        --param-CPreProcessor._expand=1 \z
+        --fields=+{signature}"'
     },
     filetypes = { "c", "cpp" },
     root_dir = vim.uv.cwd(),
@@ -618,7 +628,6 @@ map("n", "<C-k>", "<cmd>TmuxNavigateUp<CR>", "Navigate Up (tmux)")
 map("n", "<C-l>", "<cmd>TmuxNavigateRight<CR>", "Navigate Right (tmux)")
 map("n", "<C-\\>", "<cmd>TmuxNavigatePrevious<CR>", "Navigate Previous (tmux)")
 
-vim.keymap.set("n", "<leader>z", "ccZZZ(Abdul)<Esc>gcc", { desc = "Comment Sleep", remap = true })
 vim.keymap.set("n", "<S-O>", "O<ESC>")
 
 map("n", "<C-n>", ":cnext<CR>", "Quick Fix next")
