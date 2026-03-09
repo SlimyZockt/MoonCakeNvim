@@ -61,6 +61,7 @@ vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
 
 -- Ctags
 vim.g.tags = vim.fn.stdpath('config') .. '/system_tags,tags'
+vim.o.omnifunc = "syntaxcomplete#Complete"
 
 -- diagnostic
 vim.diagnostic.config {
@@ -515,9 +516,11 @@ local servers = {
             'gradlew',
             'build.gradle',
             'build.gradle.kts',
+
             -- '.git',
         },
     },
+    -- clangd = {},
     templ = {},
     markdown_oxide = {},
 }
@@ -552,18 +555,6 @@ require("mason-lspconfig").setup {
 vim.lsp.config.ctags_lsp = {
     cmd = {
         'ctags-lsp',
-        '--languages=+C,+C++',
-        '--ctags-args="ctags \z
-        --kinds-C=+fpstgve  \z
-        --kinds-C++=+cpstgve \z
-        --fields-C=+{macrodef,properties} \z
-        --fields-C++=+{macrodef,properties} \z
-        --fields=+Snl \z
-        --extras=+q \z
-        --sort=yes  \z
-        --tag-relative=yes  \z
-        --param-CPreProcessor._expand=1 \z
-        --fields=+{signature}"'
     },
     filetypes = { "c", "cpp" },
     root_dir = vim.uv.cwd(),
