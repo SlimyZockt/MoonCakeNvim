@@ -32,20 +32,47 @@ vim.o.smartindent = true
 vim.o.showmode = false
 vim.o.undofile = true
 vim.o.smartcase = true
-vim.o.updatetime = 250
 vim.o.timeoutlen = 300
 vim.o.confirm = false
+vim.o.hlsearch = true
+vim.o.incsearch = true
+vim.o.path = "**"
 -- Configure how new splits should be opened
 vim.o.splitright = true
 vim.o.splitbelow = true
-
 -- spell
 vim.o.spell = true
 vim.o.spelllang = 'en_us,de_de'
-
+-- folds
 vim.o.foldlevel = 99
 vim.o.foldlevelstart = 99
 vim.o.viewoptions = "cursor,curdir,folds"
+
+
+if vim.g.neovide then
+    -- Put anything you want to happen only in Neovide here
+    vim.g.neovide_opacity = 0.9
+    vim.g.neovide_normal_opacity = 0.9
+    -- vim.g.neovide_refresh_rate = 140
+    -- vim.cmd("highlight Normal guibg=#")
+
+    vim.g.neovide_floating_blur_amount_x = 2.0
+    vim.g.neovide_floating_blur_amount_y = 2.0
+
+    vim.api.nvim_set_keymap('v', '<sc-c>', '"+y', { noremap = true })
+    vim.api.nvim_set_keymap('n', '<sc-v>', 'l"+P', { noremap = true })
+    vim.api.nvim_set_keymap('v', '<sc-v>', '"+P', { noremap = true })
+    vim.api.nvim_set_keymap('c', '<sc-v>', '<C-o>l<C-o>"+<C-o>P<C-o>l', { noremap = true })
+    vim.api.nvim_set_keymap('i', '<sc-v>', '<ESC>l"+Pli', { noremap = true })
+    vim.api.nvim_set_keymap('t', '<sc-v>', '<C-\\><C-n>"+Pi', { noremap = true })
+
+    vim.api.nvim_create_autocmd('UIEnter', {
+        callback = function()
+            vim.api.nvim_set_hl(0, "Normal", { bg = "#1a1818" })
+        end
+    })
+end
+
 
 vim.api.nvim_create_autocmd({ "BufWinLeave" }, {
     pattern = { "*.*" },
@@ -58,6 +85,9 @@ vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
     desc = "Load view (folds) when opening file",
     command = "silent! loadview"
 })
+
+vim.cmd(":command! -nargs=+ Grep execute 'silent grep! <args>' | copen")
+vim.cmd(":packadd nvim.undotree")
 
 -- Ctags
 vim.g.tags = vim.fn.stdpath('config') .. '/system_tags,tags'
@@ -107,7 +137,7 @@ vim.pack.add({
     -- Visual
     { src = "https://github.com/nvim-tree/nvim-web-devicons" },
     -- Trees
-    { src = "https://github.com/mbbill/undotree" },
+    -- { src = "nvim.undotree" },
     { src = "https://github.com/stevearc/oil.nvim" },
     -- ( auto completion )/highlight
     { src = "https://github.com/nvim-treesitter/nvim-treesitter",          version = "main" },
@@ -116,7 +146,7 @@ vim.pack.add({
     { src = "https://github.com/mason-org/mason-lspconfig.nvim" },
     { src = "https://github.com/neovim/nvim-lspconfig" },
     { src = "https://github.com/saghen/blink.cmp" },
-    { src = "https://github.com/yioneko/nvim-vtsls" },
+    { src = "https://github.com/ej-shafran/compile-mode.nvim" },
     -- Mini Text editing
     { src = "https://github.com/nvim-mini/mini.ai" },
     { src = "https://github.com/nvim-mini/mini.surround" },
@@ -144,6 +174,7 @@ vim.pack.add({
     { src = "https://github.com/kevinhwang91/nvim-ufo" },
     -- Preview
     { src = "https://github.com/folke/which-key.nvim" },
+    { src = "https://github.com/akinsho/toggleterm.nvim" },
     { src = "https://github.com/OXY2DEV/markview.nvim" },
     { src = "https://github.com/chomosuke/typst-preview.nvim" },
     -- Sudo files
@@ -164,7 +195,27 @@ for _, v in pairs(vim.pack.get()) do
     end
 end
 
-vim.lsp.vtsls = require("vtsls").lspconfig -- set default server config, optional but recommended
+vim.g.compile_mode = {
+    -- if you use something like `nvim-cmp` or `blink.cmp` for completion,
+    -- set this to fix tab completion in command mode:
+    input_word_completion = true,
+    default_command = {
+        c = "make -k",
+        cpp = "make -k",
+        go = "go run .",
+        odin = "odin run ."
+    },
+
+    -- to add ANSI escape code support, add:
+    -- baleia_setup = true,
+
+    -- to make `:Compile` replace special characters (e.g. `%`) in
+    -- the command (and behave more like `:!`), add:
+    -- bang_expansion = true,
+    use_circular_error_navigation = true,
+}
+
+
 
 -- Mini
 require "mini.ai".setup()
@@ -199,6 +250,11 @@ require 'mini.indentscope'.setup {
 -- Icons
 require "nvim-web-devicons".setup()
 -- Preview
+require "toggleterm".setup {
+    persist_size = false,
+    size = vim.o.columns * 0.5,
+    direction = "vertical",
+}
 require "typst-preview".setup()
 require "markview".setup {
     preview = {
@@ -292,6 +348,7 @@ require 'treesitter-context'.setup {
     separator = '─',
 }
 
+
 -- format on save
 vim.api.nvim_create_autocmd("BufWritePre", {
     callback = function(event)
@@ -321,7 +378,10 @@ require "blink.cmp".setup {
         nerd_font_variant = 'mono'
     },
     sources = {
-        default = { 'lsp', 'path', 'buffer', 'snippets', 'omni' },
+        default = { 'lsp', 'path', 'buffer', 'snippets' },
+        per_filetype = {
+            c = { inherit_defaults = true, 'omni' }
+        },
     },
     snippets = { preset = 'default' },
     signature = { enabled = true },
@@ -433,6 +493,7 @@ local servers = {
         },
 
     },
+    ts_ls = {},
     ols = {
         init_options = {
             enable_inlay_hints_params = false,
@@ -442,10 +503,12 @@ local servers = {
             enable_fake_methods = true,
             enable_overload_resolution = true,
             enable_snippets = true,
+            enable_procedure_snippet = true,
             enable_auto_import = true,
             enable_comp_lit_signature_help = true,
             enable_comp_lit_signature_help_use_docs = true,
             enable_semantic_tokens = true,
+            enable_code_action_invert_if = true,
 
             enable_checker_only_saved = true,
             checker_args = '-strict-style -vet',
@@ -468,44 +531,6 @@ local servers = {
             enable_argument_placeholders = false,
         }
     },
-    vtsls = {
-
-        filetypes = {
-            "javascript",
-            "javascriptreact",
-            "javascript.jsx",
-            "typescript",
-            "typescriptreact",
-            "typescript.tsx",
-        },
-        settings = {
-            complete_function_calls = true,
-            vtsls = {
-                enableMoveToFileCodeAction = true,
-                autoUseWorkspaceTsdk = true,
-                experimental = {
-                    maxInlayHintLength = 30,
-                    completion = {
-                        enableServerSideFuzzyMatch = true,
-                    },
-                },
-            },
-            typescript = {
-                updateImportsOnFileMove = { enabled = "always" },
-                suggest = {
-                    completeFunctionCalls = true,
-                },
-                inlayHints = {
-                    enumMemberValues = { enabled = true },
-                    functionLikeReturnTypes = { enabled = true },
-                    parameterNames = { enabled = "literals" },
-                    parameterTypes = { enabled = true },
-                    propertyDeclarationTypes = { enabled = true },
-                    variableTypes = { enabled = false },
-                },
-            },
-        },
-    },
     jdtls = {
         root_markers = {
             'settings.gradle',
@@ -524,6 +549,8 @@ local servers = {
     templ = {},
     markdown_oxide = {},
 }
+
+
 
 -- LPS
 local server_list = vim.tbl_keys(servers or {})
@@ -551,16 +578,6 @@ require("mason-lspconfig").setup {
     ensure_installed = server_list,
     automatic_enable = false,
 }
-
-vim.lsp.config.ctags_lsp = {
-    cmd = {
-        'ctags-lsp',
-    },
-    filetypes = { "c", "cpp" },
-    root_dir = vim.uv.cwd(),
-}
-vim.lsp.enable("ctags_lsp")
-
 
 local gdproject = io.open(vim.fn.getcwd() .. '/project.godot', 'r')
 if gdproject then
@@ -632,6 +649,18 @@ map("n", "<A-p>", function()
     vim.diagnostic.jump({ count = -1 })
 end, "Diagnostic previous")
 
+map('n', '<leader>e', ":resize 18<CR>", "r[e]size")
+map('n', '<leader>cc', ":below Compile<CR>", "[C]ompile")
+map('n', '<leader>cr', ":below Recompile<CR>", "[R]ecompile")
+
+map('n', '<leader>x', ":copen<CR>", "Qui[X] fix list")
+map('n', '<leader>c', ":!ctags -R .<CR>", "Generate [c]tags")
+
+map('n', '<leader>ff', ":find ", "find files")
+map('n', '<leader>fg', ":Grep ", "grep")
+
+map('t', '<ESC>', "<C-\\><C-n>", "")
+
 map('n', '<leader>f', vim.lsp.buf.format, "[F]ormat")
 map("n", "zK", require("ufo").peekFoldedLinesUnderCursor, "Peek fold (ufo)")
 
@@ -643,6 +672,14 @@ map({ 'n', 'v', 'x' }, '<leader>p', '"+p', "[P]asting Global")
 map('n', '<leader>tb', ":%!xxd -r<CR>", "[B]inary")
 map('n', '<leader>th', ":%!xxd<CR>", "[H]ex")
 map('n', '<leader>te', ":Oil<CR>", "Open [E]xplorer")
-map('n', '<leader>tu', vim.cmd.UndotreeToggle, "Open [U]undotree")
-map('n', '<leader>tt', ":TypstPreview<CR>", "[T]ypstPreview")
+map('n', '<leader>tu', function()
+    require('undotree').open({
+        command = '30vnew |  wincmd H',
+    })
+    -- Move to rightmost position
+    -- vim.cmd('wincmd L')
+end, "Open [U]undotree")
+
+map('n', '<leader>ty', ":TypstPreview<CR>", "T[y]pstPreview")
+map('n', '<leader>tt', ":ToggleTerm<CR>", "[T]erminal")
 map('n', '<leader>tm', ":Markview Toggle<CR>", "[M]arkview")
