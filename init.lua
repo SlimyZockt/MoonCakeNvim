@@ -674,7 +674,7 @@ map('n', '<leader>th', ":%!xxd<CR>", "[H]ex")
 map('n', '<leader>te', ":Oil<CR>", "Open [E]xplorer")
 map('n', '<leader>tu', function()
     require('undotree').open({
-        command = '30vnew |  wincmd H',
+        command = 'leftabove 40vnew',
     })
     -- Move to rightmost position
     -- vim.cmd('wincmd L')
