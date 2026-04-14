@@ -25,6 +25,7 @@ vim.o.scrolloff = 10
 vim.opt.list = true
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣', leadmultispace = "»   " }
 vim.o.inccommand = 'split'
+
 -- Misc
 vim.o.swapfile = false
 vim.o.ignorecase = true
@@ -174,7 +175,6 @@ vim.pack.add({
     { src = "https://github.com/kevinhwang91/nvim-ufo" },
     -- Preview
     { src = "https://github.com/folke/which-key.nvim" },
-    { src = "https://github.com/akinsho/toggleterm.nvim" },
     { src = "https://github.com/OXY2DEV/markview.nvim" },
     { src = "https://github.com/chomosuke/typst-preview.nvim" },
     -- Sudo files
@@ -250,11 +250,6 @@ require 'mini.indentscope'.setup {
 -- Icons
 require "nvim-web-devicons".setup()
 -- Preview
-require "toggleterm".setup {
-    persist_size = false,
-    size = vim.o.columns * 0.5,
-    direction = "vertical",
-}
 require "typst-preview".setup()
 require "markview".setup {
     preview = {
@@ -509,6 +504,7 @@ local servers = {
             enable_comp_lit_signature_help_use_docs = true,
             enable_semantic_tokens = true,
             enable_code_action_invert_if = true,
+            enable_checker_workspace_diagnostics = true,
 
             enable_checker_only_saved = true,
             checker_args = '-strict-style -vet',
@@ -681,5 +677,4 @@ map('n', '<leader>tu', function()
 end, "Open [U]undotree")
 
 map('n', '<leader>ty', ":TypstPreview<CR>", "T[y]pstPreview")
-map('n', '<leader>tt', ":ToggleTerm<CR>", "[T]erminal")
 map('n', '<leader>tm', ":Markview Toggle<CR>", "[M]arkview")
