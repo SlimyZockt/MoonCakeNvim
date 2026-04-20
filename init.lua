@@ -143,9 +143,9 @@ vim.pack.add({
     -- ( auto completion )/highlight
     { src = "https://github.com/nvim-treesitter/nvim-treesitter",          version = "main" },
     { src = "https://github.com/nvim-treesitter/nvim-treesitter-context" },
+    { src = 'https://github.com/neovim/nvim-lspconfig' },
     { src = "https://github.com/mason-org/mason.nvim" },
     { src = "https://github.com/mason-org/mason-lspconfig.nvim" },
-    { src = "https://github.com/neovim/nvim-lspconfig" },
     { src = "https://github.com/saghen/blink.cmp" },
     { src = "https://github.com/ej-shafran/compile-mode.nvim" },
     -- Mini Text editing
@@ -489,6 +489,7 @@ local servers = {
 
     },
     ts_ls = {},
+    glsl_analyzer = {},
     ols = {
         init_options = {
             enable_inlay_hints_params = false,
@@ -545,8 +546,6 @@ local servers = {
     templ = {},
     markdown_oxide = {},
 }
-
-
 
 -- LPS
 local server_list = vim.tbl_keys(servers or {})
