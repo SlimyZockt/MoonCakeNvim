@@ -649,7 +649,7 @@ map('n', '<leader>cc', ":below Compile<CR>", "[C]ompile")
 map('n', '<leader>cr', ":below Recompile<CR>", "[R]ecompile")
 
 map('n', '<leader>x', ":copen<CR>", "Qui[X] fix list")
-map('n', '<leader>c', ":!ctags -R .<CR>", "Generate [c]tags")
+map('n', '<leader>C', ":silent !ctags -R .<CR> -", "Generate [c]tags")
 
 map('n', '<leader>ff', ":find ", "find files")
 map('n', '<leader>fg', ":Grep ", "grep")
